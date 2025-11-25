@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="description" content="job application form program"/>
+        <meta name="keywords" content="HTML, Form, tags"/>
+        <meta name=" author" content="Samuel" />
+        <title>Job Application HTML</title>
+        <link rel="stylesheet" href="styles/styles.css">
+    </head>
+    <body>
+        
+        <div class="center-cont">
+            <img src="images/companylogo.jpeg" alt="alternate">
+        </div>
+        <aside>
+        <h1>THANK YOU FOR CHOOSING CTRLALTELITE.CO</h1>
+        
+        <p id="alert-message">PLEASE FILL EACH AND EVERY PART OF THIS FORM TO ENSURE A SMOOTH SAIL TO YOUR POTENTIAL EMPLOYMENT OPPURTUNITY</p>
+        </aside>
+        <hr>
+
+        <form action="https://mercury.swin.edu.au/it000000/formtest.php" method="post" onsubmit="alert('Thank you! Your form has been submitted.');">
+            <fieldset>
+                <legend>PERSONAL DETAILS</legend>
+                <label>First Name</label>
+                <input
+                type="text"
+                size="20"
+                pattern="^[a-zA-Z]{0,20}$"
+                required="required"
+                maxlength="20"
+                >
+                
+                <br>
+                <br>
+                <label>Last Name</label>
+                <input
+                type="text"
+                size="20"
+                pattern="^[a-zA-Z]{0,20}$"
+                required="required"
+                maxlength="20">
+                <br>
+                <br>
+                
+
+                <label>Date Of birth</label>
+                <input
+                type="text"
+                pattern="\d{2}-\d{2}-\d{4}"
+                required="required">
+                <br>
+                <br>
+                <label>Email Id</label>
+                <input
+                type="text"
+                required="required"
+                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">
+                <br>
+                <br>
+                <label>Phone number</label>
+                <input
+                type="text"
+                required="required"
+                maxlength="12"
+                minlength="8">
+                <br>
+                <br>
+                
+
+
+                
+
+            </fieldset>
+            <fieldset>
+                <legend>Gender</legend>
+                <input type="radio" name="gender" value="red">
+                <label>Male</label>
+                <input type="radio"  name="gender" value="red">
+                <label>Female</label>
+                <label></label>
+            </fieldset>
+
+            <fieldset>
+                <legend>Address Details</legend>
+                <label>Unit Number</label>
+                <input
+                type="text"
+                required="required"
+                pattern="[0-9]{1,5}"
+                maxlength="5"
+                inputmode="numeric">
+                <br>
+                <br>
+
+
+                <label>Building Number</label>
+                <input
+                type="text"
+                required="required"
+                pattern="[0-9]{1,5}"
+                maxlength="5"
+                inputmode="numeric">
+                <br>
+                <br>
+
+                <label>Street Name</label>
+                <input
+                type="text"
+                required="required"
+                pattern="^[a-zA-Z]{0,20}$">
+                <br>
+                <br>
+
+                <label>Zone</label>
+                <input
+                type="text"
+                required="required"
+                pattern="[0-9]{1,5}"
+                maxlength="2">
+                <br>
+                <br>
+
+                <label>City</label>
+                <input
+                type="text"
+                size="40"
+                pattern="^[a-zA-Z]{0,40}$"
+                required="required"
+                maxlength="40"
+                >
+                <br>
+                <br>
+
+            </fieldset>
+
+            <fieldset>
+                <legend>JOB DETAILS</legend>
+                
+
+                <label>Job Reference Number</label>
+                <select id="ref" name="ref">
+                    <option value="">Please Select The Job Reference Number</option>
+                    <option value="Software Developer">G01</option>
+                    <option value="Network Administrator">G02</option>
+                
+                </select>
+                <br>
+                <br>
+
+                <label>Required Technical List</label>
+                <br>
+                <br>
+                <input 
+                type="checkbox" value="HTML" required>
+                HTML 
+                <br>
+                <br>
+                <input type="checkbox" value="css" required>
+                CSS
+                <br>
+                <br>
+                <input type="checkbox" value="python" required>
+                PYTHON 
+                <br>
+                <br>
+                <input type="checkbox" value="java" required>
+                JAVA 
+                <br>
+                <br>
+
+                <label>Other skills</label>
+                <br>
+                <br>
+                <textarea>Please Enter Your Other Skills</textarea>
+
+            </fieldset>
+            <input type="submit" value="Book">
+            <input type="submit" value="reset form">
+
+        </form>
+        
+    </body>
+</html>
