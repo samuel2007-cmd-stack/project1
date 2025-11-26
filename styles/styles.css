@@ -1,7 +1,115 @@
-.job-header {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 20px;
-    font-family: Arial, sans-serif;
+
+/*article container*/
+.job-posting {
+    max-width: 900px;
+    margin: 24px 0;
+    padding: 0; 
+    box-sizing: border-box;
+}
+/* the visual box around article */
+.job-card {
+  display: block;
+  border: 3px solid #233aa0;
+  border-radius: 16px;
+  padding: 14px;
+  background: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.30);
+}
+/* ensure summary is visible and can be styled like a row */
+summary {
+  display: block;                 /* REQUIRED so content doesn't collapse */
+  cursor: pointer;
+  outline: none;                  /* keep focus ring optional below */
+}
+
+/* hide the browser default marker (triangle) */
+summary::-webkit-details-marker {
+  display: none;
+}
+
+/* the header row layout: title left, ref right */
+.job-header .job-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;  
+ }
+
+/* remove default margins from heading*/
+.job-title {
+  margin: 0;
+  }
+
+/* smaller ref text */
+.job-ref {
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+/* Add a visible toggle indicator*/
+.job-card summary {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 48px; /* space for chevron */
+}
+
+/* full-width bar*/
+.job-card summary::after {
+  content: "▾";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #bfefff;  /* light grey bar */
+  padding: 2px 0;        /* bar height */
+  text-align: center;
+  font-size: 1.2rem;
+  pointer-events: none; /* clicks go to summary itself */
+  border-radius: 0 0 8px 8px;
+}
+
+/* when open show an up chevron */
+.job-card[open] > summary::after {
+  content: "▴";
+}
+
+/* focus outline for keyboard users*/
+.job-card summary:focus-visible {
+  box-shadow: 0 0 0 3px rgba(84, 197, 241, 0.178);
+  border-radius: 6px;
+}
+
+
+/* spacing between header and revealed body */
+.job-body {
+  padding-top: 6px;
+  border-top: 1px solid #eee;
+}
+
+/* job-meta row with even gaps */
+.job-meta {
+  display: flex;
+  gap: 30px;           /* equal spacing between meta items */
+  align-items: center;
+  line-height: 1.1;
+  font-size: 20px;
+  flex-wrap: wrap;     /* wrap on small screens */
+  margin-bottom: 0px;
+}
+
+.job-summary,.key-responsibilities,.job-skills {
+  margin-top: 12px;
+}
+
+/*table styling */
+.job-skills table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.job-skills th,.job-skills td {
+  border: 1px solid #c6e3ec;
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
 }
