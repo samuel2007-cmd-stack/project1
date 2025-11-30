@@ -3,12 +3,13 @@
   --secondary: #005fa3;
   --accent: #ffdd57;
   --neutral-light: #f5f9ff;
+  --neutral-medium: #e9ecef;
   --neutral-dark: #222222;
 }
 
 
 .container {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 0 20px;
   font-family: Arial, sans-serif;
@@ -18,7 +19,8 @@
 .header-box {
   background-color: #1E2433;
   border-radius: 8px;
-  padding: 20px;
+  border-bottom: 3px solid var(--primary);
+  padding: 10px 20px;
   margin: 20px auto;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   color: #fff;
@@ -72,9 +74,7 @@ FILE: jobs.html*/
   --section-title-size: 1.5rem;  /* change this for all h2 */
 }
 
-body {
-  font-family: Arial, sans-serif;  
-}
+
 
 
 .job-body,
@@ -483,7 +483,8 @@ main::after {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 45vh;
+    height: auto;
+    padding-top: 20px;
     
 }
 .center-cont img {
@@ -492,7 +493,7 @@ main::after {
 }
 p,h1 {
     text-align: center;
-    font-size: medium;
+    font-size: 1.1rem;
 }
 #alert-message {
     color: red;
@@ -502,16 +503,79 @@ h1 {
     font: small-caps 2em Georgia, serif;
 }
 aside {
-    width:25%;
-    float: right;
-    border: 2px solid #3498db;
-    padding:15px;
-    box-sizing: border-box;
-    margin-top: 40px;
+    width: 250px; /* Fixed width for better layout control */
+ float: right;
+ border: 1px solid var(--neutral-medium); /* Subtler border */
+padding: 20px;
+ box-sizing: border-box;
+margin: 20px 0 20px 30px; /* Consistent margin around the aside */
+background-color: #ffffff; /* White background */
+border-radius: 8px;
+box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Very soft shadow */
 }
 #anantroop{
   text-align: center;
 }
-body {
-  background-color: lightblue; /* Or any other color name, hex code, or RGB value */
+form {
+ background-color: #ffffff;
+ padding: 20px;
+ border-radius: 8px;
+ box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+ margin-bottom: 40px;
 }
+
+fieldset {
+ border: 1px solid var(--neutral-medium); /* Subtle fieldset border */
+ border-radius: 6px;
+ margin-bottom: 20px;
+ padding: 15px;
+}
+
+legend {
+ color: var(--primary);
+ font-weight: bold;
+ padding: 0 10px;
+}
+
+label {
+ display: inline-block;
+ min-width: 120px; /* Aligning labels */
+ margin-right: 10px;
+ font-weight: 500;
+ color: var(--secondary);
+}
+
+input[type="text"], input[type="email"], textarea, select {
+ padding: 8px;
+ border: 1px solid #ced4da;
+ border-radius: 4px;
+ margin-bottom: 10px;
+ transition: border-color 0.3s;
+}
+
+input[type="text"]:focus, input[type="email"]:focus, textarea:focus, select:focus {
+ border-color: var(--primary);
+ outline: none;
+}
+
+/* Button Styling */
+input[type="submit"] {
+background-color: var(--primary);
+color: white;
+ padding: 10px 20px;
+ border: none;
+ border-radius: 4px;
+ cursor: pointer;
+ font-size: 1rem;
+ margin-right: 15px;
+ transition: background-color 0.3s ease;
+}
+
+input[type="submit"][value="reset form"] {
+ background-color: var(--secondary); /* Different color for reset */
+}
+
+input[type="submit"]:hover {
+ background-color: var(--accent); /* Consistent hover */
+}
+
