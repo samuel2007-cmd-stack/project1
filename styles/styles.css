@@ -867,6 +867,12 @@ PURPOSE: STYLES FOR ABOUT PAGE
 .members-interests tbody tr:hover td {
   background: #e0e0e0; /* hex hover colour */
 }
+.members-interests caption {
+    caption-side: top; /* default: places caption above table */
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
 
 /*--------------------------------------
 END OF CODE
