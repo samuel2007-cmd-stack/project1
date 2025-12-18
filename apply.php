@@ -6,29 +6,12 @@
         <meta name="keywords" content="HTML, Form, tags"/>
         <meta name="author" content="Samuel" />
         <title>Job Application HTML</title>
-        <link rel="stylesheet" href="styles/styles.css"> <!-- External stylesheet link -->
+        <link rel="stylesheet" href="styles/styles.css">
     </head>
 
-    <body> <!-- Page body starts -->
+    <body>
 
-        <header class="header-box"> 
-  <div class="container header-flex">
-    <div class="logo-container">
-      <img src="images/logo.jpg" alt="Control Alt Elite Logo" class="logo">
-      <h1>Control Alt Elite</h1>
-    </div>
-      
-    <nav aria-label="Main Navigation">
-      <ul class="nav-menu">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="jobs.html">Job Descriptions</a></li>
-        <li><a href="apply.html">Apply Now</a></li>
-        <li><a href="about.html">About Us</a></li>
-        <li><a href="mailto:info@ctrlaltelite.com.au">Email Us</a></li>
-      </ul>
-    </nav>
-  </div>
-</header>
+<?php include 'header.inc'; ?>
         
         <!-- Intro message to applicants -->
         <aside>
@@ -38,12 +21,12 @@
             </p>
         </aside>
 
-        <hr> <!-- Horizontal line for separation -->
+        <hr>
 
         <!-- Job application form starts here -->
-        <form action="https://mercury.swin.edu.au/it000000/formtest.php" 
+        <form action="process_eoi.php" 
               method="post" 
-              onsubmit="alert('Thank you! Your form has been submitted.');"> <!-- Submits to server + alert -->
+              novalidate="novalidate">
 
             <!-- Personal details section -->
             <fieldset>
@@ -51,37 +34,37 @@
 
                 <!-- First name field -->
                 <label for="firstname">First Name</label>
-                <input type="text" id="firstname" name="firstname" size="20" pattern="^[a-zA-Z\s\-']{1,20}$" required maxlength="20">
+                <input type="text" id="firstname" name="firstname" size="20" maxlength="20">
                 <br><br>
 
                 <!-- Last name field -->
                 <label for="lastname">Last Name</label>
-                <input type="text" id="lastname" name="lastname" size="20" pattern="^[a-zA-Z\s\-']{1,20}$" required maxlength="20">
+                <input type="text" id="lastname" name="lastname" size="20" maxlength="20">
                 <br><br>
 
                 <!-- Date of birth field -->
                 <label for="dob">Date Of Birth</label>
-                <input type="date" id="dob" name="dob" required>
+                <input type="date" id="dob" name="dob">
                 <br><br>
 
                 <!-- Email field -->
                 <label for="email">Email Id</label>
-                <input type="email" id="email" name="email" required>
+                <input type="email" id="email" name="email">
                 <br><br>
 
                 <!-- Phone number field -->
                 <label for="phone">Phone Number</label>
-                <input type="tel" id="phone" name="phone" required pattern="[0-9]{8,12}" maxlength="12">
+                <input type="tel" id="phone" name="phone" maxlength="12">
                 <br><br>
             </fieldset>
 
             <!-- Gender selection -->
             <fieldset>
                 <legend>Gender</legend>
-                <input type="radio" id="male" name="gender" value="male" required>
+                <input type="radio" id="male" name="gender" value="male">
                 <label for="male">Male</label>
 
-                <input type="radio" id="female" name="gender" value="female" required>
+                <input type="radio" id="female" name="gender" value="female">
                 <label for="female">Female</label>
             </fieldset>
 
@@ -90,23 +73,32 @@
                 <legend>Address Details</legend>
 
                 <label for="unitnumber">Unit Number</label>
-                <input type="text" id="unitnumber" name="unitnumber" required pattern="[0-9]{1,5}" maxlength="5" inputmode="numeric">
+                <input type="text" id="unitnumber" name="unitnumber" maxlength="5" inputmode="numeric">
                 <br><br>
 
                 <label for="buildingnumber">Building Number</label>
-                <input type="text" id="buildingnumber" name="buildingnumber" required pattern="[0-9]{1,5}" maxlength="5" inputmode="numeric">
+                <input type="text" id="buildingnumber" name="buildingnumber" maxlength="5" inputmode="numeric">
                 <br><br>
 
                 <label for="streetname">Street Name</label>
-                <input type="text" id="streetname" name="streetname" required pattern="^[a-zA-Z0-9\s\-']{1,40}$" maxlength="40">
+                <input type="text" id="streetname" name="streetname" maxlength="40">
                 <br><br>
 
                 <label for="zone">Zone</label>
-                <input type="text" id="zone" name="zone" required pattern="[0-9]{1,2}" maxlength="2" inputmode="numeric">
+                <input type="text" id="zone" name="zone" maxlength="2" inputmode="numeric">
                 <br><br>
 
                 <label for="city">City</label>
-                <input type="text" id="city" name="city" size="40" pattern="^[a-zA-Z\s\-']{1,40}$" required maxlength="40">
+                <select id="city" name="city">
+                    <option value="">Please Select Your City</option>
+                    <option value="Doha">Doha</option>
+                    <option value="Al Wakra">Al Wakra</option>
+                    <option value="Al Khor">Al Khor</option>
+                    <option value="Dukhan">Dukhan</option>
+                    <option value="Al Shamal">Al Shamal</option>
+                    <option value="Mesaieed">Mesaieed</option>
+                    <option value="Ras Laffan">Ras Laffan</option>
+                </select>
                 <br><br>
             </fieldset>
 
@@ -116,7 +108,7 @@
 
                 <!-- Job reference dropdown -->
                 <label for="ref">Job Reference Number</label>
-                <select id="ref" name="ref" required>
+                <select id="ref" name="ref">
                     <option value="">Please Select The Job Reference Number</option>
                     <option value="Software Developer">Software Developer - #SWD93</option>
                     <option value="Network Administrator">Network Administrator - #NAD88</option>
@@ -128,16 +120,16 @@
                 <!-- Technical skills checklist -->
                 <label>Required Technical Skills (select at least one)</label>
                 <br><br>
-                <input type="checkbox" id="html" name="skills" value="HTML">
+                <input type="checkbox" id="html" name="skill1" value="HTML">
                 <label for="html">HTML</label>
                 <br><br>
-                <input type="checkbox" id="css" name="skills" value="CSS">
+                <input type="checkbox" id="css" name="skill2" value="CSS">
                 <label for="css">CSS</label>
                 <br><br>
-                <input type="checkbox" id="python" name="skills" value="Python">
+                <input type="checkbox" id="python" name="skill3" value="Python">
                 <label for="python">PYTHON</label>
                 <br><br>
-                <input type="checkbox" id="java" name="skills" value="Java">
+                <input type="checkbox" id="java" name="skill4" value="Java">
                 <label for="java">JAVA</label>
                 <br><br>
 
@@ -151,6 +143,8 @@
             <input type="submit" value="Submit">
             <input type="reset" value="Reset Form">
         </form>
+
+<?php include 'footer.inc'; ?>
         
     </body>
 </html>

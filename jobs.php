@@ -4,37 +4,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Jobs Description</title>
-
-    <!-- External CSS file linking -->
     <link rel="stylesheet" href="styles/styles.css">
 </head>
 
 <body>
 
-  <header class="header-box"> 
-  <div class="container header-flex">
-    <div class="logo-container">
-      <img src="images/logo.jpg" alt="Control Alt Elite Logo" class="logo">
-      <h1>Control Alt Elite</h1>
-    </div>
-      
-    <nav aria-label="Main Navigation">
-      <ul class="nav-menu">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="jobs.html">Job Descriptions</a></li>
-        <li><a href="apply.html">Apply Now</a></li>
-        <li><a href="about.html">About Us</a></li>
-        <li><a href="mailto:info@ctrlaltelite.com.au">Email Us</a></li>
-      </ul>
-    </nav>
-  </div>
-</header>
+<?php include 'header.inc'; ?>
 
 <!-- ================= TOP BANNER (HERO SECTION) ================= -->
 <section class="job-banner">
   <img src="images/businessman-8818855_1920.jpg" alt="banner_bg" class="job-banner-img">
-
-  <!-- Banner Text -->
   <h1 class="job-banner-title">Empowering Your Career Journey</h1>
   <p class="job-banner-subtitle">Explore roles that align with your skills, goals, and career path.</p>
 </section>
@@ -44,13 +23,10 @@
   <!-- ================= ASIDE: Why Work With Us ================= -->
   <aside class="right-aside">
     <h3 id="aside-heading">Why Work With Us?</h3>
-
-    <!-- Summary of company culture and benefits -->
     <p class="aside-note">At Control Alt Elite, we believe in creating a workplace where people feel valued, supported, 
 and motivated to grow. Joining our team means being part of a company that invests in your 
 skills and encourages your ideas. We bring: </p>
 
-    <!-- Company perks list -->
     <ul>
       <li>Supportive and collaborative work culture</li>
       <li>Opportunities for career growth and upskilling</li>
@@ -64,20 +40,15 @@ skills and encourages your ideas. We bring: </p>
 
   
   <!-- ================= JOB POSTING #1 ================= -->
-  <!-- Wrapper for each job entry -->
   <article class="job-posting">
-      
-      <!-- Expandable job card using <details> -->
       <details class="job-card"> 
 
-      <!-- Summary section always visible -->
       <summary class="job-header">
         <span class="job-top">
         <span class="job-title" role="heading" aria-level="1">Software Developer</span> 
         <span class="job-ref">#SWD93</span>
         </span>
 
-        <!-- Job metadata (salary, type, location, reporting) -->
         <span class="job-meta"> 
           <span>$55,000 – $85,000</span>
           <span>Full-Time</span>
@@ -86,15 +57,12 @@ skills and encourages your ideas. We bring: </p>
         </span>
       </summary>
       
-      <!-- Expanded content that shows when user clicks -->
       <div class="job-body">
 
-      <!-- Job summary section -->
       <section class="job-summary">
         <p>Design, develop, and maintain software applications, ensuring high performance, scalability, and usability.</p>
       </section> 
 
-      <!-- Key responsibilities list -->
       <section class="key-responsibilities">
         <h2>Key Responsibilities</h2>
         <ul>
@@ -106,7 +74,6 @@ skills and encourages your ideas. We bring: </p>
         </ul>
       </section>
 
-      <!-- Skills table -->
       <section class="job-skills">
         <h2>Skills and Qualifications</h2>
         <table>
@@ -162,7 +129,6 @@ skills and encourages your ideas. We bring: </p>
         </span>
       </summary>
       
-      <!-- Content revealed upon expanding -->
       <div class="job-body">
 
       <section class="job-summary">
@@ -362,43 +328,7 @@ skills and encourages your ideas. We bring: </p>
 
 </main>
 
-<!-- ================= FOOTER ================= -->
-<footer class="footer-box">
-  <div class="container">
-    <div class="footer-content">
-      <div class="footer-section">
-        <h3>Contact Us</h3>
-        <p>Email: info@controlaltelite.com</p>
-        <p>Phone: +974 71427215</p>
-        <p>Address: 7,Al Marsah Street,Doha </p>
-      </div>
-      <div class="footer-section">
-        <h3>Quick Links</h3>
-        <ul>
-          <li><a href="index.html" class="active">Home</a></li>
-        <li><a href="jobs.html">Job Descriptions</a></li>
-        <li><a href="apply.html">Apply Now</a></li>
-        <li><a href="about.html">About Us</a></li>
-        <li><a href="info@ctrlaltelite.com.au">Email Us</a></li>
-        </ul>
-      </div>
-      <div class="footer-section">
-        <h3>Connect With Us</h3>
-        <div class="social-links">
-          <a href="#" aria-label="LinkedIn">LinkedIn</a>
-          <a href="#" aria-label="Twitter">Twitter</a>
-          <a href="#" aria-label="Facebook">Facebook</a>
-          <p>&copy; 2025 Control Alt Elite — All rights reserved.</p>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2025 Control Alt Elite. All rights reserved.</p>
-      <p><a href="https://07samuelmoraes.atlassian.net/jira/software/projects/CAEG/boards/34?atlOrigin=eyJpIjoiNDBlNzEyOGE5MTkxNDc4NGJmMWY0MWQ5YjA0YTE5ZDciLCJwIjoiaiJ9" target="_blank">View Our Jira Project</a></p>
-      <p><a href="https://github.com/samuel2007-cmd-stack/project1.git" target="_blank">view our git repository</a></p>
-    </div>
-  </div>
-</footer>   
+<?php include 'footer.inc'; ?>
 
 </body>
 </html>

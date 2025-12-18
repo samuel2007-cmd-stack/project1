@@ -9,36 +9,17 @@
 </head>
 <body>
 
-
-<header class="header-box"> 
-  <div class="container header-flex">
-    <div class="logo-container">
-      <img src="images/logo.jpg" alt="Control Alt Elite Logo" class="logo">
-      <h1>Control Alt Elite</h1>
-    </div>
-      
-    <nav aria-label="Main Navigation">
-      <ul class="nav-menu">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="jobs.html">Job Descriptions</a></li>
-        <li><a href="apply.html">Apply Now</a></li>
-        <li><a href="about.html">About Us</a></li>
-        <li><a href="mailto:info@ctrlaltelite.com.au">Email Us</a></li>
-      </ul>
-    </nav>
-  </div>
-</header>
+<?php include 'header.inc'; ?>
 
 <section class="hero">
   <div class="hero-overlay">
     <div class="container">
       <h2>Innovative IT Solutions for Tomorrow's Challenges</h2>
       <p>At Control Alt Elite, we specialize in cutting-edge technology solutions that empower businesses to thrive in the digital age.</p>
-      <a href="jobs.html" class="cta-button">View Open Positions</a>
+      <a href="jobs.php" class="cta-button">View Open Positions</a>
     </div>
   </div>
 </section>
-
 
 <section class="company-overview-section-light">
   <div class="container">
@@ -54,7 +35,6 @@
     </div>
   </div>
 </section>
-
 
 <section class="services section-dark">
   <div class="container">
@@ -74,12 +54,11 @@
       </div>
       <div class="service-card">
         <h3>Network Administrator</h3>
-        <p>helps you in managing, monitoring, and maintaining an organization’s computer networks, ensuring security, connectivity, and efficient IT operations.</p>
+        <p>helps you in managing, monitoring, and maintaining an organization's computer networks, ensuring security, connectivity, and efficient IT operations.</p>
       </div>
     </div>
   </div>
 </section>
-
 
 <section class="values section-light">
   <div class="container">
@@ -105,43 +84,7 @@
   </div>
 </section>
 
-
-<footer class="footer-box">
-  <div class="container">
-    <div class="footer-content">
-      <div class="footer-section">
-        <h3>Contact Us</h3>
-        <p>Email: info@controlaltelite.com</p>
-        <p>Phone: +974 71427215</p>
-        <p>Address: 7,Al Marsah Street,Doha </p>
-      </div>
-      <div class="footer-section">
-        <h3>Quick Links</h3>
-        <ul>
-          <li><a href="index.html" class="active">Home</a></li>
-        <li><a href="jobs.html">Job Descriptions</a></li>
-        <li><a href="apply.html">Apply Now</a></li>
-        <li><a href="about.html">About Us</a></li>
-        <li><a href="info@ctrlaltelite.com.au">Email Us</a></li>
-        </ul>
-      </div>
-      <div class="footer-section">
-        <h3>Connect With Us</h3>
-        <div class="social-links">
-          <a href="#" aria-label="LinkedIn">LinkedIn</a>
-          <a href="#" aria-label="Twitter">Twitter</a>
-          <a href="#" aria-label="Facebook">Facebook</a>
-          <p>&copy; 2025 Control Alt Elite — All rights reserved.</p>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2025 Control Alt Elite. All rights reserved.</p>
-      <p><a href="https://07samuelmoraes.atlassian.net/jira/software/projects/CAEG/boards/34?atlOrigin=eyJpIjoiNDBlNzEyOGE5MTkxNDc4NGJmMWY0MWQ5YjA0YTE5ZDciLCJwIjoiaiJ9" target="_blank">View Our Jira Project</a></p>
-      <p><a href="https://github.com/samuel2007-cmd-stack/project1.git" target="_blank">view our git repository</a></p>
-    </div>
-  </div>
-</footer>
+<?php include 'footer.inc'; ?>
 
 </body>
 </html>
