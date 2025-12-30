@@ -5,7 +5,7 @@
         <meta name="description" content="job application form program"/>
         <meta name="keywords" content="HTML, Form, tags"/>
         <meta name="author" content="Samuel" />
-        <title>Job Application HTML</title>
+        <title>Job Application - Control Alt Elite</title>
         <link rel="stylesheet" href="styles/styles.css">
     </head>
 
@@ -34,34 +34,34 @@
 
                 <!-- First name field -->
                 <label for="firstname">First Name</label>
-                <input type="text" id="firstname" name="firstname" size="20" maxlength="20">
+                <input type="text" id="firstname" name="firstname" size="20" maxlength="20" required>
                 <br><br>
 
                 <!-- Last name field -->
                 <label for="lastname">Last Name</label>
-                <input type="text" id="lastname" name="lastname" size="20" maxlength="20">
+                <input type="text" id="lastname" name="lastname" size="20" maxlength="20" required>
                 <br><br>
 
                 <!-- Date of birth field -->
                 <label for="dob">Date Of Birth</label>
-                <input type="date" id="dob" name="dob">
+                <input type="date" id="dob" name="dob" required>
                 <br><br>
 
                 <!-- Email field -->
                 <label for="email">Email Id</label>
-                <input type="email" id="email" name="email">
+                <input type="email" id="email" name="email" required>
                 <br><br>
 
                 <!-- Phone number field -->
                 <label for="phone">Phone Number</label>
-                <input type="tel" id="phone" name="phone" maxlength="12">
+                <input type="tel" id="phone" name="phone" maxlength="12" required>
                 <br><br>
             </fieldset>
 
             <!-- Gender selection -->
             <fieldset>
                 <legend>Gender</legend>
-                <input type="radio" id="male" name="gender" value="male">
+                <input type="radio" id="male" name="gender" value="male" required>
                 <label for="male">Male</label>
 
                 <input type="radio" id="female" name="gender" value="female">
@@ -81,15 +81,15 @@
                 <br><br>
 
                 <label for="streetname">Street Name</label>
-                <input type="text" id="streetname" name="streetname" maxlength="40">
+                <input type="text" id="streetname" name="streetname" maxlength="40" required>
                 <br><br>
 
                 <label for="zone">Zone</label>
-                <input type="text" id="zone" name="zone" maxlength="2" inputmode="numeric">
+                <input type="text" id="zone" name="zone" maxlength="2" inputmode="numeric" required>
                 <br><br>
 
                 <label for="city">City</label>
-                <select id="city" name="city">
+                <select id="city" name="city" required>
                     <option value="">Please Select Your City</option>
                     <option value="Doha">Doha</option>
                     <option value="Al Wakra">Al Wakra</option>
@@ -108,7 +108,7 @@
 
                 <!-- Job reference dropdown -->
                 <label for="ref">Job Reference Number</label>
-                <select id="ref" name="ref">
+                <select id="ref" name="ref" required>
                     <option value="">Please Select The Job Reference Number</option>
                     <option value="Software Developer">Software Developer - #SWD93</option>
                     <option value="Network Administrator">Network Administrator - #NAD88</option>
@@ -139,8 +139,29 @@
                 <textarea id="otherskills" name="otherskills" rows="4" cols="50" placeholder="Please Enter Your Other Skills"></textarea>
             </fieldset>
 
+            <!-- Acknowledgement Section -->
+            <fieldset>
+                <legend>ACKNOWLEDGEMENT</legend>
+                
+                <p style="margin-bottom: 20px; line-height: 1.8; color: var(--neutral-700);">
+                    I hereby declare that the information provided in this application form is true, complete, and accurate to the best of my knowledge. 
+                    I understand that any false or misleading information may result in the rejection of my application or termination of employment if discovered after hiring.
+                </p>
+                
+                <p style="margin-bottom: 20px; line-height: 1.8; color: var(--neutral-700);">
+                    I acknowledge that Control Alt Elite will process my personal data in accordance with applicable data protection laws and 
+                    will use this information solely for recruitment purposes. I consent to the collection, storage, and processing of my personal information.
+                </p>
+                
+                <input type="checkbox" id="acknowledge" name="acknowledge" required>
+                <label for="acknowledge" style="font-weight: 600; color: var(--primary);">
+                    I acknowledge and agree to the above statements *
+                </label>
+                <br><br>
+            </fieldset>
+
             <!-- Submit and reset buttons -->
-            <input type="submit" value="Submit">
+            <input type="submit" value="Submit Application">
             <input type="reset" value="Reset Form">
         </form>
 
