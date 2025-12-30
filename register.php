@@ -21,28 +21,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (!preg_match("/[0-9]/", $password)) {
         $error = "Password must have one number";
     } else {
+        // Make sure settings variables are available
+        global $host, $user, $pwd, $sql_db;
+        
         $conn = mysqli_connect($host, $user, $pwd, $sql_db);
         
         if (!$conn) {
-            $error = "Database connection failed";
+            $error = "Database connection failed: " . mysqli_connect_error();
         } else {
-            $username = mysqli_real_escape_string($conn, $username);
+            // Check if username already exists using prepared statement
+            $checkStmt = mysqli_prepare($conn, "SELECT username FROM managers WHERE username=?");
             
-            // Check if username already exists
-            $checkQuery = "SELECT username FROM managers WHERE username='$username'";
-            $result = mysqli_query($conn, $checkQuery);
-            
-            if (mysqli_num_rows($result) > 0) {
-                $error = "Username already exists";
+            if (!$checkStmt) {
+                $error = "Database error: " . mysqli_error($conn);
             } else {
-                // Hash password and insert
-                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                $insertQuery = "INSERT INTO managers (username, password, failed_attempts) VALUES ('$username', '$hashed_password', 0)";
+                mysqli_stmt_bind_param($checkStmt, "s", $username);
+                mysqli_stmt_execute($checkStmt);
+                $result = mysqli_stmt_get_result($checkStmt);
                 
-                if (mysqli_query($conn, $insertQuery)) {
-                    $success = "Registration successful! You can now login.";
+                if (mysqli_num_rows($result) > 0) {
+                    $error = "Username already exists";
+                    mysqli_stmt_close($checkStmt);
                 } else {
-                    $error = "Registration failed: " . mysqli_error($conn);
+                    mysqli_stmt_close($checkStmt);
+                    
+                    // Hash password and insert using prepared statement
+                    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                    $insertStmt = mysqli_prepare($conn, "INSERT INTO managers (username, password, failed_attempts) VALUES (?, ?, 0)");
+                    
+                    if (!$insertStmt) {
+                        $error = "Database error: " . mysqli_error($conn);
+                    } else {
+                        mysqli_stmt_bind_param($insertStmt, "ss", $username, $hashed_password);
+                        
+                        if (mysqli_stmt_execute($insertStmt)) {
+                            $success = "Registration successful! You can now login.";
+                        } else {
+                            $error = "Registration failed: " . mysqli_stmt_error($insertStmt);
+                        }
+                        
+                        mysqli_stmt_close($insertStmt);
+                    }
                 }
             }
             
@@ -57,7 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Registration</title>
-    <link rel="stylesheet" href="dynamic/dynamic.css">
+    <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
 

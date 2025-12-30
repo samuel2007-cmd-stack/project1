@@ -42,28 +42,29 @@
         <!-- Samuel Moraes contributions -->
         <dl class="memberscont-dl"> 
             <dt>Samuel Moraes</dt>
-            <dd>Completed the HTML and CSS for the Apply page.</dd>
-            <dd>Developed the HTML structure for the About page.</dd>
-            <dd>Collaborated actively with teammates and helped clarify doubts.</dd> 
-            <dd>Ensured tasks assigned in Jira sprints were completed on time.</dd> 
+            <dd>Implemented the database-backed features including the EOI table design.</dd>
+            <dd>Developed process_eoi.php with server-side validation and database insertion.</dd>
+            <dd>Created manage.php to allow HR managers to query, update, and delete EOIs.</dd>
+            <dd>Implemented dynamic job listings by storing job data in the database.</dd>
+            <dd>Handled MySQL integration using settings.php.</dd>
         </dl>
 
         <!-- Anantroop Singh Sahi contributions -->
         <dl class="memberscont-dl">
             <dt>Anantroop Singh Sahi</dt>
-            <dd>Built the HTML and CSS for the Index (Home) page, ensuring responsive design.</dd>
-            <dd>Helped with gathering information of the team for about page</dd> 
-            <dd>Consistently maintained Jira story progress.</dd>
-            <dd>Collaborated actively with teammates and helped clarify doubts.</dd>
+            <dd>Completed the enhancements component of the project (enhancements.php).</dd>
+            <dd>Implemented advanced features such as manager-side sorting and access control.</dd>
+            <dd>Ensured enhancements were documented clearly according to project specifications.</dd>
+            <dd>Assisted with project testing and refinement.</dd>
         </dl>
 
         <!-- Beatrice Thomas contributions -->
         <dl class="memberscont-dl">
             <dt>Beatrice Thomas</dt>
-            <dd>Created the HTML and CSS for the Jobs page, including interactive sections.</dd>
-            <dd>Completed the CSS for the About page, ensuring visual consistency across the site.</dd>
-            <dd>Collaborated actively with teammates and helped clarify doubts.</dd>
-            <dd>Completed all assigned Jira tasks within sprint deadlines.</dd>
+            <dd>Modularised the website using PHP includes for header, navigation, and footer.</dd>
+            <dd>Updated and structured the About page to clearly document team contributions.</dd>
+            <dd>Ensured semantic HTML, accessibility, and consistency across pages.</dd>
+            <dd>Collaborated with teammates to integrate frontend and backend components.</dd>
         </dl>
     </div>
 </section> 
