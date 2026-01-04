@@ -71,7 +71,7 @@
 
 <!-- Section displaying group photo -->
 <section class="group-image" aria-labelledby="group-image-heading">
-    <img src="images/luca-bravo-impeI_8oGW0-unsplash.jpg" alt="group-image-bg" class="groupimg-bg">
+    
     <h2 id="group-image-heading" class="groupimg-title">Introducing our Team</h2>
     <div class="groupimg-photo-box">
         <figure class="group-figure">

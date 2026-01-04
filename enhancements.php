@@ -8,7 +8,7 @@ session_start();?>
   <title>Enhancements</title>
   <link rel="stylesheet" href="styles/styles.css">
 </head>
-<body>
+<body class="enhancements-page">
 
 <?php include 'header.inc'; ?>
 
