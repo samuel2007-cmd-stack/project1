@@ -16,6 +16,11 @@ if ($_SERVER["REQUEST_METHOD"] != "POST") {
 // Include database connection
 require_once 'settings.php';
 
+// Check if connection exists
+if (!isset($conn) || !$conn) {
+    die("Database connection failed. Please check your settings.php file.");
+}
+
 // Initialize error array
 $errors = array();
 
@@ -195,6 +200,9 @@ if (!empty($errors)) {
     include 'footer.inc';
     
     echo "</body></html>";
+    
+    // Close database connection
+    mysqli_close($conn);
     exit();
 }
 
