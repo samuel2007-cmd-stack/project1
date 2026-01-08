@@ -1,48 +1,23 @@
 <?php
+// Get the current page filename
 $current_page = basename($_SERVER['PHP_SELF']);
-
-$nav_items = [
-    'index.php' => 'Home',
-    'jobs.php' => 'Job Descriptions',
-    'apply.php' => 'Apply Now',
-    'about.php' => 'About Us',
-    'enhancements.php' => 'Enhancements'
-];
 ?>
 
-<nav aria-label="Main Navigation" class="main-nav">
+<nav aria-label="Main Navigation">
   <ul class="nav-menu">
-    <?php foreach ($nav_items as $file => $label): ?>
-      <li>
-        <a href="<?= $file ?>" 
-           class="<?= ($current_page == $file) ? 'active' : '' ?>" 
-           <?= ($current_page == $file) ? 'aria-current="page"' : '' ?>>
-          <?= $label ?>
-        </a>
-      </li>
-    <?php endforeach; ?>
-
-    <?php if (isset($_SESSION['manager_logged_in'])): ?>
-      <li class="manager-nav-group">
-        <a href="manage.php" 
-           class="<?= ($current_page == 'manage.php') ? 'active' : '' ?>" 
-           <?= ($current_page == 'manage.php') ? 'aria-current="page"' : '' ?>>
-           Manage EOI
-        </a>
-      </li>
-      <li><a href="logout.php" class="nav-logout">Logout</a></li>
+    <li><a href="index.php" <?php if($current_page == 'index.php') echo 'class="active"'; ?>>Home</a></li>
+    <li><a href="jobs.php" <?php if($current_page == 'jobs.php') echo 'class="active"'; ?>>Job Descriptions</a></li>
+    <li><a href="apply.php" <?php if($current_page == 'apply.php') echo 'class="active"'; ?>>Apply Now</a></li>
+    <li><a href="about.php" <?php if($current_page == 'about.php') echo 'class="active"'; ?>>About Us</a></li>
+    <li><a href="enhancements.php" <?php if($current_page == 'enhancements.php') echo 'class="active"'; ?>>Enhancements</a></li>
+    
+    <?php if(isset($_SESSION['manager_logged_in'])): ?>
+      <li><a href="manage.php" <?php if($current_page == 'manage.php') echo 'class="active"'; ?>>Manage EOI</a></li>
+      <li><a href="logout.php">Logout</a></li>
     <?php else: ?>
-      <li>
-        <a href="login.php" 
-           class="<?= ($current_page == 'login.php') ? 'active' : '' ?>"
-           <?= ($current_page == 'login.php') ? 'aria-current="page"' : '' ?>>
-           Manager Login
-        </a>
-      </li>
+      <li><a href="login.php" <?php if($current_page == 'login.php') echo 'class="active"'; ?>>Manager Login</a></li>
     <?php endif; ?>
-
-    <li class="nav-contact">
-      <a href="mailto:info@ctrlaltelite.com.au?subject=Inquiry from Website">Email Us</a>
-    </li>
+    
+    <li><a href="https://mail.google.com/mail/?view=cm&fs=1&to=info@ctrlaltelite.com.au&su=Inquiry%20from%20Control%20Alt%20Elite%20Website" target="_blank">Email Us</a></li>
   </ul>
 </nav>

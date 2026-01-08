@@ -1,98 +1,345 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Career opportunities at Control Alt Elite. Explore roles in Software Development, Cybersecurity, Cloud Engineering, and Network Administration.">
-    <title>Careers | Control Alt Elite</title>
-    <link rel="stylesheet" href="styles/styles.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Jobs Description</title>
+    <link rel="stylesheet" href="styles/styles.css">
 </head>
 
-<body class="jobs-page">
+<body>
 
 <?php include 'header.inc'; ?>
 
-<header class="job-banner">
-    <div class="banner-content">
-        <h1 class="job-banner-title">Empowering Your Career Journey</h1>
-        <p class="job-banner-subtitle">Explore roles that align with your skills, goals, and career path.</p>
-    </div>
-</header>
+<!-- ================= TOP BANNER (HERO SECTION) ================= -->
+<section class="job-banner">
+  <img src="images/businessman-8818855_1920.jpg" alt="banner_bg" class="job-banner-img">
+  <h1 class="job-banner-title">Empowering Your Career Journey</h1>
+  <p class="job-banner-subtitle">Explore roles that align with your skills, goals, and career path.</p>
+</section>
 
-<div class="container main-layout">
-    <main class="job-listings">
-        
-        <article class="job-card" id="software-developer">
-            <details class="job-details" open> 
-                <summary class="job-summary-header">
-                    <div class="job-title-group">
-                        <h2 class="job-title">Software Developer</h2>
-                        <span class="job-ref-badge">Ref: #SWD93</span>
-                    </div>
-                    <div class="job-quick-info">
-                        <span><i class="icon-salary"></i> $55k – $85k</span>
-                        <span><i class="icon-type"></i> Full-Time</span>
-                        <span><i class="icon-loc"></i> Local (HQ)</span>
-                    </div>
-                </summary>
-                
-                <div class="job-content">
-                    <section>
-                        <h3>Position Purpose</h3>
-                        <p>Design, develop, and maintain software applications, ensuring high performance, scalability, and usability for our core product line.</p>
-                    </section>
+<main>
 
-                    <section>
-                        <h3>Key Responsibilities</h3>
-                        <ul>
-                            <li>Develop and maintain web applications using Java or Python.</li>
-                            <li>Collaborate with UI/UX designers on feature requirements.</li>
-                            <li>Implement secure APIs and integrate robust databases.</li>
-                        </ul>
-                    </section>
+  <!-- ================= ASIDE: Why Work With Us ================= -->
+  <aside class="right-aside">
+    <h3 id="aside-heading">Why Work With Us?</h3>
+    <p class="aside-note">At Control Alt Elite, we believe in creating a workplace where people feel valued, supported, 
+and motivated to grow. Joining our team means being part of a company that invests in your 
+skills and encourages your ideas. We bring: </p>
 
-                    <section class="requirements-grid">
-                        <div class="req-column">
-                            <h4>Required Skills</h4>
-                            <ul>
-                                <li>2+ years experience in software development.</li>
-                                <li>Proficiency in SQL databases (MySQL/PostgreSQL).</li>
-                            </ul>
-                        </div>
-                        <div class="req-column">
-                            <h4>Preferred Skills</h4>
-                            <ul>
-                                <li>Experience with React or Vue.js.</li>
-                                <li>Familiarity with AWS/Azure services.</li>
-                            </ul>
-                        </div>
-                    </section>
+    <ul>
+      <li>Supportive and collaborative work culture</li>
+      <li>Opportunities for career growth and upskilling</li>
+      <li>Competitive salary packages and performance bonuses</li>
+      <li>Flexible work arrangements depending on the role</li>
+      <li>Work on real-world, impactful technology projects</li>
+    </ul>
 
-                    <div class="job-actions">
-                        <a href="apply.php?ref=SWD93" class="btn-apply">Apply for this Position</a>
-                    </div>
-                </div>
-            </details>
-        </article>
+    <p><strong>Apply now to join us and build your future with Control Alt Elite.</strong></p>
+  </aside>
 
-        </main>
+  
+  <!-- ================= JOB POSTING #1 ================= -->
+  <article class="job-posting">
+      <details class="job-card"> 
 
-    <aside class="job-sidebar">
-        <div class="sidebar-box">
-            <h3>Why Work With Us?</h3>
-            <p>At Control Alt Elite, we invest in your growth. We offer:</p>
-            <ul class="benefit-list">
-                <li>Collaborative work culture</li>
-                <li>Competitive salary & bonuses</li>
-                <li>Flexible work arrangements</li>
-                <li>Real-world impactful projects</li>
-            </ul>
-            <p class="sidebar-cta">Ready to start? <strong>Apply today.</strong></p>
-        </div>
-    </aside>
-</div>
+      <summary class="job-header">
+        <span class="job-top">
+        <span class="job-title" role="heading" aria-level="1">Software Developer</span> 
+        <span class="job-ref">#SWD93</span>
+        </span>
+
+        <span class="job-meta"> 
+          <span>$55,000 – $85,000</span>
+          <span>Full-Time</span>
+          <span>Local</span>
+          <span>Reports to: Senior Software Engineer</span>
+        </span>
+      </summary>
+      
+      <div class="job-body">
+
+      <section class="job-summary">
+        <p>Design, develop, and maintain software applications, ensuring high performance, scalability, and usability.</p>
+      </section> 
+
+      <section class="key-responsibilities">
+        <h2>Key Responsibilities</h2>
+        <ul>
+          <li>Develop and maintain web or desktop applications using industry-standard technologies.</li>
+          <li>Write clean, maintainable, and well-documented code.</li>
+          <li>Debug, troubleshoot, and fix application issues.</li>
+          <li>Collaborate with UI/UX designers and product managers on feature requirements.</li>
+          <li>Implement APIs, integrate databases, and participate in code reviews.</li>
+        </ul>
+      </section>
+
+      <section class="job-skills">
+        <h2>Skills and Qualifications</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Required Skills</th>
+              <th>Preferred Skills</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <ol>
+                  <li>2+ years experience in software development.</li>
+                  <li>Proficiency in Java, Python, or C#.</li>
+                  <li>Understanding of SQL databases (MySQL/PostgreSQL).</li>
+                  <li>Experience with Git version control.</li>
+                </ol>
+              </td>
+              <td>
+                <ol>
+                  <li>Experience with React, Angular, or Vue.js.</li>
+                  <li>Knowledge of RESTful API design.</li>
+                  <li>Familiarity with AWS/Azure cloud services.</li>
+                  <li>Unit testing frameworks (JUnit, PyTest, NUnit).</li>
+                </ol>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      </div>
+      </details>
+  </article>
+
+    
+  <!-- ================= JOB POSTING #2 ================= -->
+  <article class="job-posting">
+      <details class="job-card"> 
+
+      <summary class="job-header">
+        <span class="job-top">
+        <span class="job-title" role="heading" aria-level="1">Cyber Security Analyst</span> 
+        <span class="job-ref">#CSA71</span>
+        </span>
+
+        <span class="job-meta"> 
+          <span>$60,000 – $95,000</span>
+          <span>Full-Time</span>
+          <span>Remote</span>
+          <span>Reports To: Information Security Manager</span>
+        </span>
+      </summary>
+      
+      <div class="job-body">
+
+      <section class="job-summary">
+        <p>Monitor, detect, and respond to security threats, ensuring the confidentiality and integrity of organizational systems.</p>
+      </section> 
+
+      <section class="key-responsibilities">
+        <h2>Key Responsibilities</h2>
+        <ul>
+          <li>Monitor SIEM dashboards and detect unusual activity.</li>
+          <li>Conduct vulnerability scans and prepare mitigation reports.</li>
+          <li>Perform security audits on networks and endpoints.</li>
+          <li>Investigate incidents, malware alerts, and breaches.</li>
+          <li>Maintain firewall policies and endpoint security tools.</li>
+        </ul>
+      </section>
+
+      <section class="job-skills">
+        <h2>Skills and Qualifications</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Required Skills</th>
+              <th>Preferred Skills</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <ol>
+                  <li>1–3 years experience in cybersecurity.</li>
+                  <li>Knowledge of SIEM tools (Splunk, QRadar).</li>
+                  <li>Strong understanding of OS security (Windows/Linux).</li>
+                  <li>Good knowledge of networking concepts (TCP/IP, ports, firewalls).</li>
+                </ol>
+              </td>
+              <td>
+                <ol>
+                  <li>Experience with penetration testing tools (Burp Suite, Nmap).</li>
+                  <li>Knowledge of cloud security (AWS IAM, Azure Defender).</li>
+                  <li>Incident response workflow knowledge.</li>
+                  <li>Certifications: CompTIA Security+, CEH, or equivalent.</li>
+                </ol>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      </div>
+      </details>
+  </article>
+
+    
+  <!-- ================= JOB POSTING #3 ================= -->
+  <article class="job-posting">
+      <details class="job-card"> 
+
+      <summary class="job-header">
+        <span class="job-top">
+        <span class="job-title" role="heading" aria-level="1">Cloud Engineer</span> 
+        <span class="job-ref">#CEN54</span>
+        </span>
+
+        <span class="job-meta"> 
+          <span>$75,000 – $120,000</span>
+          <span>Full-Time</span>
+          <span>Hybrid</span>
+          <span>Reports to: Cloud Infrastructure Lead</span>
+        </span>
+      </summary>
+      
+      <div class="job-body">
+
+      <section class="job-summary">
+        <p>Design, deploy, and maintain cloud-based infrastructure, ensuring performance, reliability, and scalability.</p>
+      </section> 
+
+      <section class="key-responsibilities">
+        <h2>Key Responsibilities</h2>
+        <ul>
+          <li>Deploy and manage cloud services on AWS/Azure/GCP.</li>
+          <li>Implement and maintain Infrastructure as Code (Terraform, CloudFormation).</li>
+          <li>Configure monitoring tools and alerts.</li>
+          <li>Troubleshoot performance, networking, and deployment issues.</li>
+          <li>Optimize cloud resource usage and cost.</li>
+        </ul>
+      </section>
+
+      <section class="job-skills">
+        <h2>Skills and Qualifications</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Required Skills</th>
+              <th>Preferred Skills</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <ol>
+                  <li>2+ years experience in cloud engineering.</li>
+                  <li>Hands-on experience with AWS, Azure, or GCP.</li>
+                  <li>Strong Linux administration skills.</li>
+                  <li>Knowledge of networking concepts (VPCs, subnets, routing).</li>
+                </ol>
+              </td>
+              <td>
+                <ol>
+                  <li>Experience with Docker and Kubernetes.</li>
+                  <li>Scripting skills (Python, Bash).</li>
+                  <li>Experience with CI/CD tools (GitHub Actions, Jenkins).</li>
+                  <li>Cloud certifications: AWS Solutions Architect, Azure Admin.</li>
+                </ol>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      </div>
+      </details>
+  </article>    
+
+
+  <!-- ================= JOB POSTING #4 ================= -->
+  <article class="job-posting">
+      <details class="job-card"> 
+
+      <summary class="job-header">
+        <span class="job-top">
+        <span class="job-title" role="heading" aria-level="1">Network Administrator</span> 
+        <span class="job-ref">#NAD88</span>
+        </span>
+
+        <span class="job-meta"> 
+          <span>$50,000 – $80,000</span>
+          <span>Full-Time</span>
+          <span>Local</span>
+          <span>Reports To: IT Infrastructure Manager</span>
+        </span>
+      </summary>
+      
+      <div class="job-body">
+
+      <section class="job-summary">
+        <p>Install, manage, and support network systems to ensure seamless connectivity across the organization.</p>
+      </section> 
+
+      <section class="key-responsibilities">
+        <h2>Key Responsibilities</h2>
+        <ul>
+          <li>Configure and maintain routers, switches, and firewalls.</li>
+          <li>Troubleshoot network outages, latency, and performance issues.</li>
+          <li>Monitor network traffic and set up alerts.</li>
+          <li>Maintain VPN and user access controls.</li>
+          <li>Install and update network-related hardware and firmware.</li>
+        </ul>
+      </section>
+
+      <section class="job-skills">
+        <h2>Skills and Qualifications</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Required Skills</th>
+              <th>Preferred Skills</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+              <ol>
+                  <li>4+ years experience in network administration.</li>
+                  <li>Knowledge of TCP/IP, routing, switching, subnetting.</li>
+                  <li>Experience with Cisco or Juniper devices.</li>
+                  <li>Understanding of firewalls and VPNs.</li>
+                </ol>
+              </td>
+              <td>
+                <ol>
+                  <li>Knowledge of Linux/Windows servers.</li>
+                  <li>Experience with network monitoring tools (Nagios, Zabbix).</li>
+                  <li>Basic scripting knowledge (Bash/Python).</li>
+                  <li>Certification: CCNA, Network+.</li>
+                </ol>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      </div>
+      </details>
+  </article>   
+
+</main>
 
 <?php include 'footer.inc'; ?>
 
 </body>
 </html>
+
+<!-- ================= REFERENCES & AI DISCLOSURE ================= -->
+<!-- 
+1. Layout inspiration source:
+   https://themewagon.github.io/jobfinderportal/job_listing.html
+
+2. Job descriptions generated with GenAI (ChatGPT).
+   Prompt used:
+   "I need detailed and realistic job descriptions for different IT roles 
+   including Software Developer, Cyber Security Analyst, Cloud Engineer, 
+   and Network Administrator."
