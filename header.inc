@@ -1,21 +1,19 @@
-<?php
+<?php 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
-<header class="main-header">
-  <div class="header-container">
-    
-    <div class="brand-identity">
-      <a href="index.php">
-        <img src="images/logo.jpg" alt="Control Alt Elite Logo" class="site-logo">
-      </a>
-      <div class="site-title">
-        <h1>Control Alt Elite</h1>
-      </div>
-    </div>
 
+<header class="header-box">
+  <div class="header-flex">
+    <div class="logo-container">
+      <a href="index.php">
+        <img src="images/logo.jpg" alt="Control Alt Elite Logo" class="logo">
+      </a>
+      <h1>Control Alt Elite</h1>
+    </div>
+    
     <nav aria-label="Main Navigation">
       <ul class="nav-menu">
         <li><a href="index.php" class="<?= ($current_page == 'index.php') ? 'active' : '' ?>">Home</a></li>
@@ -30,12 +28,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <?php else: ?>
           <li><a href="login.php" class="<?= ($current_page == 'login.php') ? 'active' : '' ?>">Manager Login</a></li>
         <?php endif; ?>
-
-        <li class="nav-contact">
-          <a href="mailto:info@ctrlaltelite.com.au?subject=Inquiry">Email Us</a>
-        </li>
+        
+        <li><a href="mailto:info@ctrlaltelite.com.au?subject=Inquiry">Email Us</a></li>
       </ul>
     </nav>
-
   </div>
 </header>
