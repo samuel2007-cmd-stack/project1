@@ -1,70 +1,56 @@
 <?php
 session_start();
+
+if (isset($_SESSION['manager_logged_in'])) {
+    header("Location: manage.php");
+    exit();
+}
+
 require_once 'settings.php';
 
 $error = "";
 $success = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = trim($_POST['username']);
-    $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
+    $username = trim(htmlspecialchars($_POST['username']));
+    $password = trim($_POST['password']);
+    $confirm_password = trim($_POST['confirm_password']);
     
     if (empty($username) || empty($password) || empty($confirm_password)) {
-        $error = "All fields are required";
+        $error = "All fields are required.";
     } elseif ($password !== $confirm_password) {
-        $error = "Passwords do not match";
-    } elseif (strlen($password) < 8) {
-        $error = "Password must be at least 8 characters";
-    } elseif (!preg_match("/[A-Z]/", $password)) {
-        $error = "Password must have one uppercase letter";
-    } elseif (!preg_match("/[0-9]/", $password)) {
-        $error = "Password must have one number";
+        $error = "Passwords do not match.";
+    } elseif (strlen($password) < 8 || !preg_match("/[A-Z]/", $password) || !preg_match("/[0-9]/", $password)) {
+        $error = "Password does not meet security requirements.";
     } else {
-        // Make sure settings variables are available
-        global $host, $user, $pwd, $sql_db;
-        
         $conn = mysqli_connect($host, $user, $pwd, $sql_db);
         
         if (!$conn) {
-            $error = "Database connection failed: " . mysqli_connect_error();
+            $error = "System error. Please try again later.";
         } else {
-            // Check if username already exists using prepared statement
             $checkStmt = mysqli_prepare($conn, "SELECT username FROM managers WHERE username=?");
+            mysqli_stmt_bind_param($checkStmt, "s", $username);
+            mysqli_stmt_execute($checkStmt);
+            mysqli_stmt_store_result($checkStmt);
             
-            if (!$checkStmt) {
-                $error = "Database error: " . mysqli_error($conn);
+            if (mysqli_stmt_num_rows($checkStmt) > 0) {
+                $error = "Username is already taken.";
+                mysqli_stmt_close($checkStmt);
             } else {
-                mysqli_stmt_bind_param($checkStmt, "s", $username);
-                mysqli_stmt_execute($checkStmt);
-                $result = mysqli_stmt_get_result($checkStmt);
+                mysqli_stmt_close($checkStmt);
                 
-                if (mysqli_num_rows($result) > 0) {
-                    $error = "Username already exists";
-                    mysqli_stmt_close($checkStmt);
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                $insertStmt = mysqli_prepare($conn, "INSERT INTO managers (username, password) VALUES (?, ?)");
+                mysqli_stmt_bind_param($insertStmt, "ss", $username, $hashed_password);
+                
+                if (mysqli_stmt_execute($insertStmt)) {
+                    header("Location: login.php?msg=registered");
+                    exit();
                 } else {
-                    mysqli_stmt_close($checkStmt);
-                    
-                    // Hash password and insert using prepared statement
-                    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                    $insertStmt = mysqli_prepare($conn, "INSERT INTO managers (username, password, failed_attempts) VALUES (?, ?, 0)");
-                    
-                    if (!$insertStmt) {
-                        $error = "Database error: " . mysqli_error($conn);
-                    } else {
-                        mysqli_stmt_bind_param($insertStmt, "ss", $username, $hashed_password);
-                        
-                        if (mysqli_stmt_execute($insertStmt)) {
-                            $success = "Registration successful! You can now login.";
-                        } else {
-                            $error = "Registration failed: " . mysqli_stmt_error($insertStmt);
-                        }
-                        
-                        mysqli_stmt_close($insertStmt);
-                    }
+                    $error = "An unexpected error occurred during registration.";
                 }
+                mysqli_stmt_close($insertStmt);
             }
-            
             mysqli_close($conn);
         }
     }
@@ -75,51 +61,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manager Registration</title>
+    <title>Manager Registration | Control Alt Elite</title>
     <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
 
 <?php include 'header.inc'; ?>
 
-<div class="login-container">
-    <h1>Manager Registration</h1>
-    
-    <?php if ($error != ""): ?>
-        <div class="error-message">
-            <p><?php echo htmlspecialchars($error); ?></p>
-        </div>
-    <?php endif; ?>
-    
-    <?php if ($success != ""): ?>
-        <div class="success-message">
-            <p><?php echo htmlspecialchars($success); ?></p>
-            <p><a href="login.php">Go to Login</a></p>
-        </div>
-    <?php endif; ?>
-    
-    <form method="post" class="login-form">
-        <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-        </div>
+<main class="manage-container">
+    <section class="login-card">
+        <h1>Manager Registration</h1>
         
-        <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            <small>Must be 8+ characters with 1 uppercase letter and 1 number</small>
-        </div>
+        <?php if ($error): ?>
+            <div class="error-box" role="alert" style="color: #721c24; background: #f8d7da; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                <p><?= htmlspecialchars($error); ?></p>
+            </div>
+        <?php endif; ?>
         
-        <div class="form-group">
-            <label for="confirm_password">Confirm Password:</label>
-            <input type="password" id="confirm_password" name="confirm_password" required>
-        </div>
+        <form action="register.php" method="post" novalidate>
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required value="<?= isset($username) ? htmlspecialchars($username) : '' ?>">
+            </div>
+            
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+                <small style="display: block; color: #666; margin-top: 5px;">Must be 8+ characters, include 1 uppercase letter and 1 number.</small>
+            </div>
+            
+            <div class="input-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+            </div>
+            
+            <button type="submit" class="btn">Register Manager</button>
+        </form>
         
-        <button type="submit" class="btn">Register</button>
-    </form>
-    
-    <p class="register-link">Already have an account? <a href="login.php">Login here</a></p>
-</div>
+        <p style="margin-top: 20px; font-size: 0.9em;">Already have an account? <a href="login.php">Login here</a></p>
+    </section>
+</main>
 
 <?php include 'footer.inc'; ?>
 

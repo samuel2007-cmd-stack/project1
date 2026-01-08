@@ -1,308 +1,95 @@
 <?php
-/**
- * Process EOI Form Submission
- * Validates data and inserts into database
- */
-
-// Start session for error handling
 session_start();
 
-// Check if form was submitted via POST
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
     header("Location: apply.php");
     exit();
 }
 
-// Include database connection
 require_once 'settings.php';
 
-// Check if connection exists
-if (!isset($conn) || !$conn) {
-    die("Database connection failed. Please check your settings.php file.");
+if (!$conn) {
+    die("Database connection failed.");
 }
 
-// Initialize error array
+function sanitize_input($data) {
+    return htmlspecialchars(stripslashes(trim($data)));
+}
+
 $errors = array();
 
-// Sanitization function
-function sanitize_input($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-}
+$job_ref = sanitize_input($_POST["ref"] ?? '');
+$valid_refs = array("Software Developer", "Network Administrator", "Cybersecurity", "Cloud Engineer");
+if (!in_array($job_ref, $valid_refs)) $errors[] = "Invalid job reference selection.";
 
-// Validate and sanitize Job Reference
-if (empty($_POST["ref"])) {
-    $errors[] = "Job reference number is required.";
+$firstname = sanitize_input($_POST["firstname"] ?? '');
+if (!preg_match("/^[a-zA-Z\s\-']{1,20}$/", $firstname)) $errors[] = "First name must be alpha characters (max 20).";
+
+$lastname = sanitize_input($_POST["lastname"] ?? '');
+if (!preg_match("/^[a-zA-Z\s\-']{1,20}$/", $lastname)) $errors[] = "Last name must be alpha characters (max 20).";
+
+$dob = sanitize_input($_POST["dob"] ?? '');
+if (!empty($dob)) {
+    $birthdate = new DateTime($dob);
+    $today = new DateTime();
+    $age = $today->diff($birthdate)->y;
+    if ($age < 15 || $age > 80) $errors[] = "Applicants must be between 15 and 80 years old.";
 } else {
-    $job_ref = sanitize_input($_POST["ref"]);
-    $valid_refs = array("Software Developer", "Network Administrator", "Cybersecurity", "Cloud Engineer");
-    if (!in_array($job_ref, $valid_refs)) {
-        $errors[] = "Invalid job reference number.";
-    }
-}
-
-// Validate and sanitize First Name
-if (empty($_POST["firstname"])) {
-    $errors[] = "First name is required.";
-} else {
-    $firstname = sanitize_input($_POST["firstname"]);
-    if (!preg_match("/^[a-zA-Z\s\-']{1,20}$/", $firstname)) {
-        $errors[] = "First name must be maximum 20 alphabetic characters.";
-    }
-}
-
-// Validate and sanitize Last Name
-if (empty($_POST["lastname"])) {
-    $errors[] = "Last name is required.";
-} else {
-    $lastname = sanitize_input($_POST["lastname"]);
-    if (!preg_match("/^[a-zA-Z\s\-']{1,20}$/", $lastname)) {
-        $errors[] = "Last name must be maximum 20 alphabetic characters.";
-    }
-}
-
-// Validate Date of Birth
-if (empty($_POST["dob"])) {
     $errors[] = "Date of birth is required.";
-} else {
-    $dob = sanitize_input($_POST["dob"]);
-    // Validate date format and check if it's a valid date
-    $date_parts = explode("-", $dob);
-    if (count($date_parts) != 3 || !checkdate($date_parts[1], $date_parts[2], $date_parts[0])) {
-        $errors[] = "Invalid date of birth format.";
-    }
 }
 
-// Validate Gender
-if (empty($_POST["gender"])) {
-    $errors[] = "Gender is required.";
-} else {
-    $gender = sanitize_input($_POST["gender"]);
-    if (!in_array($gender, array("male", "female"))) {
-        $errors[] = "Invalid gender selection.";
-    }
-}
+$gender = sanitize_input($_POST["gender"] ?? '');
+if (!in_array($gender, ["male", "female"])) $errors[] = "Please select a valid gender.";
 
-// Validate Unit Number
-if (empty($_POST["unitnumber"])) {
-    $errors[] = "Unit number is required.";
-} else {
-    $unit_number = sanitize_input($_POST["unitnumber"]);
-    if (!preg_match("/^[0-9]{1,5}$/", $unit_number)) {
-        $errors[] = "Unit number must be 1-5 digits.";
-    }
-}
+$unit = sanitize_input($_POST["unitnumber"] ?? '');
+$building = sanitize_input($_POST["buildingnumber"] ?? '');
+$street = sanitize_input($_POST["streetname"] ?? '');
+if (empty($unit) || empty($building) || empty($street)) $errors[] = "Full address details are required.";
 
-// Validate Building Number
-if (empty($_POST["buildingnumber"])) {
-    $errors[] = "Building number is required.";
-} else {
-    $building_number = sanitize_input($_POST["buildingnumber"]);
-    if (!preg_match("/^[0-9]{1,5}$/", $building_number)) {
-        $errors[] = "Building number must be 1-5 digits.";
-    }
-}
+$city = sanitize_input($_POST["city"] ?? '');
+$zone = sanitize_input($_POST["zone"] ?? '');
+if (empty($city) || empty($zone)) $errors[] = "City and Zone are required.";
 
-// Validate Street Name (Street Address)
-if (empty($_POST["streetname"])) {
-    $errors[] = "Street name is required.";
-} else {
-    $street_address = sanitize_input($_POST["streetname"]);
-    if (strlen($street_address) > 40) {
-        $errors[] = "Street address must be maximum 40 characters.";
-    }
-}
+$email = sanitize_input($_POST["email"] ?? '');
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "A valid email address is required.";
 
-// Validate Zone
-if (empty($_POST["zone"])) {
-    $errors[] = "Zone is required.";
-} else {
-    $zone = sanitize_input($_POST["zone"]);
-    if (!preg_match("/^[0-9]{1,2}$/", $zone)) {
-        $errors[] = "Zone must be a 1 or 2 digit number.";
-    }
-}
+$phone = sanitize_input($_POST["phone"] ?? '');
+if (!preg_match("/^[0-9]{8,12}$/", $phone)) $errors[] = "Phone number must be between 8 and 12 digits.";
 
-// Validate City
-if (empty($_POST["city"])) {
-    $errors[] = "City is required.";
-} else {
-    $city = sanitize_input($_POST["city"]);
-    $valid_cities = array("Doha", "Al Wakra", "Al Khor", "Dukhan", "Al Shamal", "Mesaieed", "Ras Laffan");
-    if (!in_array($city, $valid_cities)) {
-        $errors[] = "Invalid city. Must be one of: Doha, Al Wakra, Al Khor, Dukhan, Al Shamal, Mesaieed, Ras Laffan.";
-    }
-}
-
-// Validate Email
-if (empty($_POST["email"])) {
-    $errors[] = "Email address is required.";
-} else {
-    $email = sanitize_input($_POST["email"]);
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = "Invalid email address format.";
-    }
-}
-
-// Validate Phone Number
-if (empty($_POST["phone"])) {
-    $errors[] = "Phone number is required.";
-} else {
-    $phone = sanitize_input($_POST["phone"]);
-    if (!preg_match("/^[0-9]{8,12}$/", $phone)) {
-        $errors[] = "Phone number must be 8-12 digits.";
-    }
-}
-
-// Validate Skills - at least one must be selected
 $skill1 = isset($_POST["skill1"]) ? sanitize_input($_POST["skill1"]) : NULL;
 $skill2 = isset($_POST["skill2"]) ? sanitize_input($_POST["skill2"]) : NULL;
 $skill3 = isset($_POST["skill3"]) ? sanitize_input($_POST["skill3"]) : NULL;
 $skill4 = isset($_POST["skill4"]) ? sanitize_input($_POST["skill4"]) : NULL;
+$other_skills = sanitize_input($_POST["otherskills"] ?? "");
 
-if (!$skill1 && !$skill2 && !$skill3 && !$skill4) {
-    $errors[] = "At least one technical skill must be selected.";
-}
+if (!$skill1 && !$skill2 && !$skill3 && !$skill4) $errors[] = "Please select at least one technical skill.";
 
-// Validate Other Skills
-$other_skills = isset($_POST["otherskills"]) ? sanitize_input($_POST["otherskills"]) : "";
-
-// If there are errors, display them
 if (!empty($errors)) {
-    echo "<!DOCTYPE html>
-    <html lang='en'>
-    <head>
-        <meta charset='UTF-8'>
-        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-        <title>Validation Errors</title>
-        <link rel='stylesheet' href='styles/styles.css'>
-        <link rel='stylesheet' href='styles/process_styles.css'>
-    </head>
-    <body>";
-    
-    include 'header.inc';
-    
-    echo "<div class='error-container'>
-            <h1>Validation Errors</h1>
-            <p>Please correct the following errors and try again:</p>
-            <ul class='error-list'>";
-    
-    foreach ($errors as $error) {
-        echo "<li>" . htmlspecialchars($error) . "</li>";
-    }
-    
-    echo "</ul>
-            <a href='apply.php' class='back-button'>Go Back to Form</a>
-          </div>";
-    
-    include 'footer.inc';
-    
-    echo "</body></html>";
-    
-    // Close database connection
-    mysqli_close($conn);
+    $_SESSION['form_errors'] = $errors;
+    header("Location: apply.php"); 
     exit();
 }
 
-// Create table if it doesn't exist
-$create_table_sql = "CREATE TABLE IF NOT EXISTS eoi (
-    EOInumber INT(11) AUTO_INCREMENT PRIMARY KEY,
-    job_reference VARCHAR(10) NOT NULL,
-    first_name VARCHAR(20) NOT NULL,
-    last_name VARCHAR(20) NOT NULL,
-    street_address VARCHAR(40) NOT NULL,
-    suburb_town VARCHAR(40) NOT NULL,
-    state VARCHAR(3) NOT NULL,
-    postcode VARCHAR(4) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    phone VARCHAR(12) NOT NULL,
-    skill1 VARCHAR(50) NULL,
-    skill2 VARCHAR(50) NULL,
-    skill3 VARCHAR(50) NULL,
-    skill4 VARCHAR(50) NULL,
-    other_skills TEXT NULL,
-    status ENUM('New', 'Current', 'Final') DEFAULT 'New' NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)";
+$full_address = "$unit/$building $street";
+$status = "New";
 
-if (!mysqli_query($conn, $create_table_sql)) {
-    die("Error creating table: " . mysqli_error($conn));
-}
+$query = "INSERT INTO eoi (job_reference, first_name, last_name, street_address, suburb_town, state, postcode, email, phone, skill1, skill2, skill3, skill4, other_skills, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-// Combine address components
-$full_street_address = $unit_number . "/" . $building_number . " " . $street_address;
-
-// Prepare and execute INSERT statement
-$insert_sql = "INSERT INTO eoi (job_reference, first_name, last_name, 
-                street_address, suburb_town, state, postcode, email, phone, 
-                skill1, skill2, skill3, skill4, other_skills, status) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'New')";
-
-$stmt = mysqli_prepare($conn, $insert_sql);
-
+$stmt = mysqli_prepare($conn, $query);
 if ($stmt) {
-    // Bind parameters - 14 parameters total (status is hardcoded as 'New')
-    mysqli_stmt_bind_param($stmt, "ssssssssssssss", 
-        $job_ref, 
-        $firstname, 
-        $lastname, 
-        $full_street_address, 
-        $city,
-        $zone,
-        $zone, // Using zone as postcode for Qatar
-        $email, 
-        $phone, 
-        $skill1, 
-        $skill2, 
-        $skill3, 
-        $skill4, 
-        $other_skills
+    mysqli_stmt_bind_param($stmt, "sssssssssssssss", 
+        $job_ref, $firstname, $lastname, $full_address, $city, $zone, $zone, 
+        $email, $phone, $skill1, $skill2, $skill3, $skill4, $other_skills, $status
     );
-    
-    // Execute the statement
+
     if (mysqli_stmt_execute($stmt)) {
-        // Get the auto-generated EOInumber
-        $eoi_number = mysqli_insert_id($conn);
-        
-        // Display success page
-        echo "<!DOCTYPE html>
-        <html lang='en'>
-        <head>
-            <meta charset='UTF-8'>
-            <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-            <title>Application Submitted Successfully</title>
-            <link rel='stylesheet' href='styles/styles.css'>
-            <link rel='stylesheet' href='styles/process_styles.css'>
-        </head>
-        <body>";
-        
-        include 'header.inc';
-        
-        echo "<div class='success-container'>
-                <h1>✓ Application Submitted Successfully!</h1>
-                <p class='success-message'>Thank you for your Expression of Interest.</p>
-                <p class='success-message'>Your application has been received and recorded.</p>
-                <div class='eoi-number'>EOI #" . $eoi_number . "</div>
-                <p class='success-message'>Please save this reference number for your records.</p>
-                <p class='success-message'>We will contact you at <strong>" . htmlspecialchars($email) . "</strong></p>
-                <a href='index.php' class='home-button'>Return to Home Page</a>
-              </div>";
-        
-        include 'footer.inc';
-        
-        echo "</body></html>";
-        
+        $eoi_id = mysqli_insert_id($conn);
+        header("Location: post_apply.php?id=$eoi_id");
     } else {
-        echo "Error: " . mysqli_stmt_error($stmt);
+        echo "Submission error. Please contact admin.";
     }
-    
     mysqli_stmt_close($stmt);
-} else {
-    echo "Error preparing statement: " . mysqli_error($conn);
 }
 
-// Close database connection
 mysqli_close($conn);
 ?>

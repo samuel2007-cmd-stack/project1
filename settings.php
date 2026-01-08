@@ -1,23 +1,16 @@
 <?php
-/**
- * Database Configuration File
- * Contains database connection settings
- */
-
-// Database configuration
 $host = "localhost";
 $user = "root";
-$password = "";  // Empty password for XAMPP default
-$database = "ctrlaltelite";
+$pwd  = "";
+$db   = "ctrlaltelite";
 
-// Create connection
-$conn = mysqli_connect($host, $user, $password, $database);
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-// Check connection
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+try {
+    $conn = new mysqli($host, $user, $pwd, $db);
+    $conn->set_charset("utf8mb4");
+} catch (mysqli_sql_exception $e) {
+    error_log($e->getMessage());
+    exit("Database service is currently unavailable. Please try again later.");
 }
-
-// Set character set to utf8 for proper encoding
-mysqli_set_charset($conn, "utf8");
 ?>
