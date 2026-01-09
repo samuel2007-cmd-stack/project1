@@ -1,3 +1,12 @@
+<?php
+/**
+ * Homepage - index.php
+ * Main landing page for Control Alt Elite website
+ * 
+ * Part of COS10026 Web Technology Project Part 2
+ * Control Alt Elite - Group Project
+ */
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +22,6 @@
   
   <?php include 'header.inc'; ?>
   
-  <!-- Hero Section -->
   <section class="hero">
     <div class="hero-overlay">
       <h2>Innovative IT Solutions for Tomorrow's Challenges</h2>
@@ -22,8 +30,8 @@
     </div>
   </section>
   
-  <!-- Company Overview Section -->
-  <section class="section-light company-overview-section-light">
+  <!-- Enhanced "Who We Are" section with gradient background -->
+  <section class="section-gradient company-overview-section">
     <h2>Who We Are</h2>
     <div class="overview-content">
       <div class="overview-text">
@@ -37,7 +45,6 @@
     </div>
   </section>
   
-  <!-- Services Section -->
   <section class="services section-dark">
     <h2>Our Services</h2>
     <div class="services-grid">
@@ -65,7 +72,6 @@
     </div>
   </section>
   
-  <!-- Core Values Section -->
   <section class="values">
     <h2>Our Core Values</h2>
     <div class="values-list">
@@ -93,11 +99,12 @@
     </div>
   </section>
   
-  <!-- Call to Action Section -->
-  <section class="section-light" style="text-align: center; padding: 60px 24px;">
-    <h2>Ready to Transform Your Business?</h2>
-    <p style="font-size: 1.2rem; margin-bottom: 32px; max-width: 700px; margin-left: auto; margin-right: auto;">Join the hundreds of organizations that trust Control Alt Elite for their technology needs. We're currently hiring talented professionals to join our growing team.</p>
-    <a href="jobs.php" class="cta-button">Explore Career Opportunities</a>
+  <section class="section-cta">
+    <div class="cta-content">
+      <h2>Ready to Transform Your Business?</h2>
+      <p>Join the hundreds of organizations that trust Control Alt Elite for their technology needs. We're currently hiring talented professionals to join our growing team.</p>
+      <a href="jobs.php" class="cta-button">Explore Career Opportunities</a>
+    </div>
   </section>
   
   <?php include 'footer.inc'; ?>

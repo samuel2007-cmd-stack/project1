@@ -1,25 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8"/>
-        <meta name="description" content="job application form program"/>
-        <meta name="keywords" content="HTML"/>
-        <meta name="author" content="Samuel" />
-        <title>Job Application HTML</title>
-        <link rel="stylesheet" href="styles/styles.css">
-    </head>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Meet the Control Alt Elite team and learn about our contributions"/>
+    <meta name="keywords" content="about us, team members, project contributions, Control Alt Elite"/>
+    <meta name="author" content="Control Alt Elite Team"/>
+    <title>About Us - Control Alt Elite</title>
+    <link rel="stylesheet" href="styles/styles.css">
+</head>
 
 <body>
 
 <?php include 'header.inc'; ?>
 
-<!-- Banner image for About Us page -->
 <section class="about-banner">
     <img src="images/luca-bravo-impeI_8oGW0-unsplash.jpg" alt="Background" class="banner-bg">
     <h1>ABOUT US</h1>
 </section>
 
-<!-- Section listing group members -->
 <section class="member-box" aria-labelledby="members-heading">
   <h2 id="members-heading">Meet Our Group Members</h2>
   <ul class="member-list">
@@ -35,11 +34,10 @@
   </ul>
 </section> 
 
-<!-- Section detailing contributions of each member -->
 <section class="members-contribution" aria-labelledby="members-contribution-heading">
     <h2 id="members-contribution-heading" class="memberscont-title">Our Contributions</h2>
     <div class="memberscont-container">
-        <!-- Samuel Moraes contributions -->
+        
         <dl class="memberscont-dl"> 
             <dt>Samuel Moraes</dt>
             <dd>Implemented the database-backed features including the EOI table design.</dd>
@@ -49,7 +47,6 @@
             <dd>Handled MySQL integration using settings.php.</dd>
         </dl>
 
-        <!-- Anantroop Singh Sahi contributions -->
         <dl class="memberscont-dl">
             <dt>Anantroop Singh Sahi</dt>
             <dd>Completed the enhancements component of the project (enhancements.php).</dd>
@@ -58,7 +55,6 @@
             <dd>Assisted with project testing and refinement.</dd>
         </dl>
 
-        <!-- Beatrice Thomas contributions -->
         <dl class="memberscont-dl">
             <dt>Beatrice Thomas</dt>
             <dd>Modularised the website using PHP includes for header, navigation, and footer.</dd>
@@ -69,7 +65,6 @@
     </div>
 </section> 
 
-<!-- Section displaying group photo -->
 <section class="group-image" aria-labelledby="group-image-heading">
     
     <h2 id="group-image-heading" class="groupimg-title">Introducing our Team</h2>
@@ -81,7 +76,6 @@
     </div>
 </section>
 
-<!-- Section showing members and their interests -->
 <section class="interests-section" aria-labelledby="interests-heading">
   <h2 id="interests-heading" class="members-interests-heading">Members and Interests</h2>
 
@@ -97,15 +91,18 @@
     <tbody>
       <tr>
         <td>1</td>
-        <td colspan="2">Samuel Moraes — Coding, Gaming and Football</td>
+        <td>Samuel Moraes</td>
+        <td>Coding, Gaming and Football</td>
       </tr>
       <tr>
         <td>2</td>
-        <td colspan="2">Anantroop Singh Sahi — Gaming and Cricket</td>
+        <td>Anantroop Singh Sahi</td>
+        <td>Gaming and Cricket</td>
       </tr>
       <tr>
         <td>3</td>
-        <td colspan="2">Beatrice Thomas — Basketball, Gaming and Designing</td>
+        <td>Beatrice Thomas</td>
+        <td>Basketball, Gaming and Designing</td>
       </tr>
     </tbody>
   </table>

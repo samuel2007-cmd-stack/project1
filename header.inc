@@ -16,20 +16,18 @@ $current_page = basename($_SERVER['PHP_SELF']);
     
     <nav aria-label="Main Navigation">
       <ul class="nav-menu">
-        <li><a href="index.php" class="<?= ($current_page == 'index.php') ? 'active' : '' ?>">Home</a></li>
-        <li><a href="jobs.php" class="<?= ($current_page == 'jobs.php') ? 'active' : '' ?>">Job Descriptions</a></li>
-        <li><a href="apply.php" class="<?= ($current_page == 'apply.php') ? 'active' : '' ?>">Apply Now</a></li>
-        <li><a href="about.php" class="<?= ($current_page == 'about.php') ? 'active' : '' ?>">About Us</a></li>
-        <li><a href="enhancements.php" class="<?= ($current_page == 'enhancements.php') ? 'active' : '' ?>">Enhancements</a></li>
+        <li><a href="index.php" <?= ($current_page == 'index.php') ? 'class="active"' : '' ?>>Home</a></li>
+        <li><a href="jobs.php" <?= ($current_page == 'jobs.php') ? 'class="active"' : '' ?>>Jobs</a></li>
+        <li><a href="apply.php" <?= ($current_page == 'apply.php') ? 'class="active"' : '' ?>>Apply</a></li>
+        <li><a href="about.php" <?= ($current_page == 'about.php') ? 'class="active"' : '' ?>>About</a></li>
+        <li><a href="enhancements.php" <?= ($current_page == 'enhancements.php') ? 'class="active"' : '' ?>>Enhancements</a></li>
         
         <?php if (isset($_SESSION['manager_logged_in'])): ?>
-          <li><a href="manage.php" class="<?= ($current_page == 'manage.php') ? 'active' : '' ?>">Manage EOI</a></li>
-          <li><a href="logout.php">Logout</a></li>
+          <li><a href="manage.php" <?= ($current_page == 'manage.php') ? 'class="active"' : '' ?>>Manage</a></li>
+          <li><a href="logout.php" class="logout-btn">Logout</a></li>
         <?php else: ?>
-          <li><a href="login.php" class="<?= ($current_page == 'login.php') ? 'active' : '' ?>">Manager Login</a></li>
+          <li><a href="login.php" <?= ($current_page == 'login.php') ? 'class="active"' : '' ?>>Login</a></li>
         <?php endif; ?>
-        
-        <li><a href="mailto:info@ctrlaltelite.com.au?subject=Inquiry">Email Us</a></li>
       </ul>
     </nav>
   </div>

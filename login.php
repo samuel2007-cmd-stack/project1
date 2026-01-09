@@ -4,7 +4,6 @@ require_once 'settings.php';
 
 $error = "";
 
-// Redirect if already logged in
 if (isset($_SESSION['manager_logged_in'])) {
     header("Location: manage.php");
     exit();
@@ -20,7 +19,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (!$conn) {
             $error = "Database connection failed";
         } else {
-            // Use prepared statement for security
             $stmt = mysqli_prepare($conn, "SELECT * FROM managers WHERE username=?");
             mysqli_stmt_bind_param($stmt, "s", $username);
             mysqli_stmt_execute($stmt);
@@ -29,7 +27,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (mysqli_num_rows($result) == 1) {
                 $manager = mysqli_fetch_assoc($result);
                 
-                // Check lockout
                 if ($manager['lockout_time'] != NULL) {
                     $current = new DateTime();
                     $lockout = new DateTime($manager['lockout_time']);
@@ -39,7 +36,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $minutes = $diff->i + 1;
                         $error = "Account locked. Please wait $minutes minutes.";
                     } else {
-                        // Lockout expired, reset it
                         $resetStmt = mysqli_prepare($conn, "UPDATE managers SET failed_attempts=0, lockout_time=NULL WHERE username=?");
                         mysqli_stmt_bind_param($resetStmt, "s", $username);
                         mysqli_stmt_execute($resetStmt);
@@ -47,14 +43,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }
                 }
                 
-                // Verify password if not locked
                 if ($error == "") {
                     if (password_verify($password, $manager['password'])) {
-                        // Successful login
                         $_SESSION['manager_logged_in'] = true;
                         $_SESSION['manager_username'] = $username;
                         
-                        // Reset failed attempts
                         $resetStmt = mysqli_prepare($conn, "UPDATE managers SET failed_attempts=0, lockout_time=NULL WHERE username=?");
                         mysqli_stmt_bind_param($resetStmt, "s", $username);
                         mysqli_stmt_execute($resetStmt);
@@ -65,11 +58,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         header("Location: manage.php");
                         exit();
                     } else {
-                        // Wrong password - increment failed attempts
                         $failed = $manager['failed_attempts'] + 1;
                         
                         if ($failed >= 3) {
-                            // Lock account for 15 minutes
                             $lockout_time = date('Y-m-d H:i:s', strtotime('+15 minutes'));
                             $updateStmt = mysqli_prepare($conn, "UPDATE managers SET failed_attempts=?, lockout_time=? WHERE username=?");
                             mysqli_stmt_bind_param($updateStmt, "iss", $failed, $lockout_time, $username);
@@ -105,37 +96,60 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manager Login</title>
+    <meta name="description" content="Manager login portal for Control Alt Elite">
+    <meta name="keywords" content="login, manager, authentication, Control Alt Elite">
+    <title>Manager Login - Control Alt Elite</title>
     <link rel="stylesheet" href="styles/styles.css">
 </head>
-<body>
+<body class="auth-page">
 
 <?php include 'header.inc'; ?>
 
-<div class="login-container">
-    <h1>Manager Login</h1>
-    
-    <?php if ($error != ""): ?>
-        <div class="error-message">
-            <p><?php echo htmlspecialchars($error); ?></p>
-        </div>
-    <?php endif; ?>
-    
-    <form method="post" class="login-form">
-        <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-        </div>
+<div class="auth-hero">
+    <div class="auth-hero-content">
+        <h1>Manager Login</h1>
+        <p>Access the management dashboard</p>
+    </div>
+</div>
+
+<div class="auth-container">
+    <div class="auth-box">
         
-        <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
+        <?php if ($error != ""): ?>
+            <div class="error-message">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <p><?php echo htmlspecialchars($error); ?></p>
+            </div>
+        <?php endif; ?>
         
-        <button type="submit" class="btn">Login</button>
-    </form>
-    
-    <p class="register-link">Don't have an account? <a href="register.php">Register here</a></p>
+        <form method="post" class="auth-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            
+            <button type="submit" class="auth-btn">
+                <span>Login</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </button>
+        </form>
+        
+        <div class="auth-footer">
+            <p>Don't have an account? <a href="register.php">Register here</a></p>
+        </div>
+    </div>
 </div>
 
 <?php include 'footer.inc'; ?>

@@ -1,0 +1,326 @@
+/* ===== ENHANCED JOBS PAGE STYLING ===== */
+
+/* Enhanced Filter Section */
+.filters-container {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 20px;
+    padding: 32px;
+    margin: 0 auto 40px;
+    max-width: 1200px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.filters-form {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr auto;
+    gap: 16px;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #334155;
+    min-width: auto;
+}
+
+.filter-group input,
+.filter-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+    margin-bottom: 0;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    outline: none;
+}
+
+.filter-btn {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    padding: 12px 32px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.filter-btn:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+}
+
+.clear-btn {
+    background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+    box-shadow: 0 6px 20px rgba(100, 116, 139, 0.3);
+}
+
+.clear-btn:hover {
+    background: linear-gradient(135deg, #475569 0%, #334155 100%);
+    box-shadow: 0 10px 30px rgba(100, 116, 139, 0.4);
+}
+
+/* Stats Badge */
+.stats-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    50% { 
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
+    }
+}
+
+.job-stats {
+    text-align: center;
+    margin-bottom: 32px;
+    font-size: 1.2rem;
+    color: #ffffff;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* Enhanced Job Cards */
+.job-card {
+    position: relative;
+    overflow: visible;
+}
+
+.applicant-count {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    z-index: 10;
+    animation: slideInRight 0.5s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Loading Animation */
+.loading {
+    text-align: center;
+    padding: 60px 20px;
+    color: #ffffff;
+    font-size: 1.3rem;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.loading::after {
+    content: '...';
+    animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+}
+
+/* No Results */
+.no-results {
+    text-align: center;
+    padding: 80px 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.no-results h3 {
+    font-size: 2rem;
+    color: #1e293b;
+    margin-bottom: 16px;
+    font-weight: 800;
+}
+
+.no-results p {
+    font-size: 1.1rem;
+    color: #64748b;
+    line-height: 1.8;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .filters-form {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .filter-group:first-child {
+        grid-column: 1 / -1;
+    }
+    
+    .filter-btn {
+        padding: 12px 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .filters-container {
+        padding: 24px;
+        margin-bottom: 32px;
+    }
+    
+    .filters-form {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .filter-group input,
+    .filter-group select {
+        padding: 10px 14px;
+        font-size: 0.95rem;
+    }
+    
+    .filter-btn {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 0.95rem;
+    }
+
+    .applicant-count {
+        position: static;
+        display: inline-block;
+        margin-top: 12px;
+        margin-left: 12px;
+    }
+    
+    .job-stats {
+        font-size: 1rem;
+    }
+    
+    .stats-badge {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .filters-container {
+        padding: 20px;
+        border-radius: 16px;
+    }
+    
+    .filter-group label {
+        font-size: 0.9rem;
+    }
+    
+    .no-results {
+        padding: 60px 20px;
+    }
+    
+    .no-results h3 {
+        font-size: 1.5rem;
+    }
+    
+    .no-results p {
+        font-size: 1rem;
+    }
+}
+
+/* Fade in animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Enhanced hover effects for job cards */
+.job-posting {
+    animation: fadeInUp 0.6s ease-out;
+    animation-fill-mode: both;
+}
+
+.job-posting:nth-child(1) { animation-delay: 0.1s; }
+.job-posting:nth-child(2) { animation-delay: 0.2s; }
+.job-posting:nth-child(3) { animation-delay: 0.3s; }
+.job-posting:nth-child(4) { animation-delay: 0.4s; }
+
+/* Smooth transitions for filter changes */
+.filters-form * {
+    transition: all 0.3s ease;
+}
+
+/* Focus styles for accessibility */
+.filter-btn:focus,
+.filter-group input:focus,
+.filter-group select:focus {
+    outline: 3px solid rgba(59, 130, 246, 0.5);
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .filters-container,
+    .job-stats,
+    .applicant-count {
+        display: none;
+    }
+    
+    .job-card {
+        page-break-inside: avoid;
+    }
+}
