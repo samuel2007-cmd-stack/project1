@@ -52,7 +52,8 @@ function validateEmail($email) {
 }
 
 function validatePhone($phone) {
-    return preg_match('/^[0-9]{8}$/', $phone);
+    $phone = str_replace(' ', '', $phone);
+    return preg_match('/^\d{8,12}$/', $phone);
 }
 
 function validateDate($date) {
@@ -67,27 +68,36 @@ function validateDate($date) {
     return checkdate($month, $day, $year);
 }
 
+function calculateAge($dob) {
+    $dob_parts = explode('/', $dob);
+    if (count($dob_parts) != 3) {
+        return 0;
+    }
+    
+    $birth_date = new DateTime($dob_parts[2] . '-' . $dob_parts[1] . '-' . $dob_parts[0]);
+    $today = new DateTime();
+    return $today->diff($birth_date)->y;
+}
+
 function validatePostcode($postcode) {
-    return preg_match('/^[0-9]{2}$/', $postcode);
+    return preg_match('/^\d{4}$/', $postcode);
 }
 
 function validateName($name, $maxLength = 20) {
-    return preg_match('/^[a-zA-Z\s]{1,' . $maxLength . '}$/', $name);
+    if (strlen($name) > $maxLength) {
+        return false;
+    }
+    return preg_match('/^[a-zA-Z\s\-]+$/', $name);
 }
 
 function validateAddress($address, $maxLength = 40) {
-    return strlen($address) > 0 && strlen($address) <= $maxLength;
+    if (strlen($address) > $maxLength) {
+        return false;
+    }
+    return preg_match('/^[a-zA-Z0-9\s\.\,\-\/]+$/', $address);
 }
 
-$valid_cities = [
-    'Doha',
-    'Al Wakra',
-    'Al Khor',
-    'Dukhan',
-    'Al Shamal',
-    'Mesaieed',
-    'Ras Laffan'
-];
+$valid_cities = ['Doha', 'Al Wakra', 'Al Khor', 'Dukhan', 'Al Shamal', 'Mesaieed', 'Ras Laffan'];
 
 function validateCity($city) {
     global $valid_cities;

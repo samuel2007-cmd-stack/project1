@@ -3,6 +3,8 @@ session_start();
 
 // Prevent direct access - only allow POST requests
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
+    // Debug: Log the request method
+    error_log("Non-POST request to process_eoi.php: " . $_SERVER["REQUEST_METHOD"]);
     header("Location: apply.php");
     exit();
 }
@@ -76,12 +78,16 @@ if (empty($dob)) {
     }
 }
 
+// Note: Date of birth is validated but not stored in database
+
 // Validate Gender
 if (empty($gender)) {
     $errors[] = "Gender is required.";
 } elseif (!in_array($gender, array("male", "female", "other"))) {
     $errors[] = "Invalid gender selection.";
 }
+
+// Note: Gender is validated but not stored in database
 
 // Validate Street Address
 if (empty($streetaddress)) {
@@ -205,11 +211,9 @@ if (mysqli_num_rows($table_check) == 0) {
         job_reference VARCHAR(10) NOT NULL,
         first_name VARCHAR(20) NOT NULL,
         last_name VARCHAR(20) NOT NULL,
-        dob VARCHAR(10) NOT NULL,
-        gender VARCHAR(10) NOT NULL,
         street_address VARCHAR(40) NOT NULL,
         suburb_town VARCHAR(40) NOT NULL,
-        state VARCHAR(3) NOT NULL,
+        state VARCHAR(40) NOT NULL,
         postcode VARCHAR(4) NOT NULL,
         email VARCHAR(255) NOT NULL,
         phone VARCHAR(12) NOT NULL,
@@ -229,10 +233,10 @@ if (mysqli_num_rows($table_check) == 0) {
 }
 
 // Prepare SQL statement with parameterized query to prevent SQL injection
-$insert_sql = "INSERT INTO eoi (job_reference, first_name, last_name, dob, gender,
+$insert_sql = "INSERT INTO eoi (job_reference, first_name, last_name,
                 street_address, suburb_town, state, postcode, email, phone, 
                 skill1, skill2, skill3, skill4, other_skills, status) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'New')";
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'New')";
 
 $stmt = mysqli_prepare($conn, $insert_sql);
 
@@ -241,17 +245,15 @@ if (!$stmt) {
     die("An error occurred while processing your application. Please try again later.");
 }
 
-// Bind parameters - Note: Fixed the bug where postcode was bound twice
-mysqli_stmt_bind_param($stmt, "ssssssssssssssss", 
+// Bind parameters
+mysqli_stmt_bind_param($stmt, "ssssssssssssss", 
     $job_ref, 
     $firstname, 
     $lastname, 
-    $dob, 
-    $gender,
     $streetaddress, 
     $suburb, 
-    $city,          // FIXED: Was $postcode (wrong!)
-    $postcode,      // FIXED: Now in correct position
+    $city,
+    $postcode,
     $email, 
     $phone, 
     $skill1, 
@@ -331,106 +333,4 @@ if (mysqli_stmt_execute($stmt)) {
 
 mysqli_stmt_close($stmt);
 closeDatabaseConnection($conn);
-
-// ============================================================================
-// HELPER FUNCTIONS (Add these if not in settings.php)
-// ============================================================================
-
-/**
- * Sanitize user input to prevent XSS attacks
- */
-function sanitizeInput($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-}
-
-/**
- * Validate name fields (alphabetic characters and spaces only)
- */
-function validateName($name, $maxLength) {
-    if (strlen($name) > $maxLength) {
-        return false;
-    }
-    return preg_match("/^[a-zA-Z\s\-]+$/", $name);
-}
-
-/**
- * Validate date in dd/mm/yyyy format
- */
-function validateDate($date) {
-    if (!preg_match("/^(\d{2})\/(\d{2})\/(\d{4})$/", $date, $matches)) {
-        return false;
-    }
-    
-    $day = (int)$matches[1];
-    $month = (int)$matches[2];
-    $year = (int)$matches[3];
-    
-    return checkdate($month, $day, $year);
-}
-
-/**
- * Calculate age from date of birth
- */
-function calculateAge($dob) {
-    $dob_parts = explode('/', $dob);
-    if (count($dob_parts) != 3) {
-        return 0;
-    }
-    
-    $birth_date = new DateTime($dob_parts[2] . '-' . $dob_parts[1] . '-' . $dob_parts[0]);
-    $today = new DateTime();
-    return $today->diff($birth_date)->y;
-}
-
-/**
- * Validate address fields
- */
-function validateAddress($address, $maxLength) {
-    if (strlen($address) > $maxLength) {
-        return false;
-    }
-    return preg_match("/^[a-zA-Z0-9\s\.\,\-\/]+$/", $address);
-}
-
-/**
- * Validate postcode (exactly 4 digits)
- */
-function validatePostcode($postcode) {
-    return preg_match("/^\d{4}$/", $postcode);
-}
-
-/**
- * Validate city/state selection
- */
-function validateCity($city) {
-    $valid_cities = array("QLD", "NSW", "VIC", "TAS", "SA", "WA", "NT", "ACT");
-    return in_array(strtoupper($city), $valid_cities);
-}
-
-/**
- * Validate email address
- */
-function validateEmail($email) {
-    return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
-}
-
-/**
- * Validate phone number (8 to 12 digits, spaces allowed)
- */
-function validatePhone($phone) {
-    $phone = str_replace(' ', '', $phone);
-    return preg_match("/^\d{8,12}$/", $phone);
-}
-
-/**
- * Close database connection safely
- */
-function closeDatabaseConnection($conn) {
-    if ($conn) {
-        mysqli_close($conn);
-    }
-}
 ?>

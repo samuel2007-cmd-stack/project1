@@ -4672,4 +4672,449 @@ footer {
     font-size: 1.5rem;
   }
 }
+/* ===== FIX FOR "LIST ALL EOIs" CARD ONLY ===== */
+/* Add this to the END of your styles.css file */
+
+/* Fix the card heading to wrap properly */
+.manage-card h2 {
+  font-size: 1.3rem !important;
+  line-height: 1.4 !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  hyphens: auto !important;
+  max-width: 100% !important;
+  white-space: normal !important;
+}
+
+/* Fix the form row (Sort by and Order fields) */
+.manage-card .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* Fix form group labels and inputs */
+.manage-card .form-group label {
+  font-size: 0.95rem !important;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.manage-card .form-group select {
+  font-size: 0.95rem !important;
+  padding: 10px 14px !important;
+  width: 100%;
+}
+
+/* Fix the button */
+.manage-card button[name="list_all"] {
+  font-size: 1rem !important;
+  padding: 12px 24px !important;
+  white-space: nowrap;
+}
+
+/* Mobile fix for the card */
+@media (max-width: 768px) {
+  .manage-card h2 {
+    font-size: 1.1rem !important;
+  }
+  
+  .manage-card .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .manage-card h2 {
+    font-size: 1rem !important;
+  }
+}
+/* ===== MAKE MANAGE PAGE CARDS AND TEXT BIGGER ===== */
+/* Add this to the END of your styles.css file */
+
+/* Make the cards bigger */
+.manage-card {
+  padding: 40px 36px !important;
+  min-height: 400px;
+}
+
+/* Make card headings bigger */
+.manage-card h2 {
+  font-size: 1.8rem !important;
+  margin-bottom: 32px !important;
+  padding-bottom: 20px !important;
+}
+
+/* Make form labels bigger */
+.manage-card label {
+  font-size: 1.2rem !important;
+  margin-bottom: 10px !important;
+  font-weight: 700;
+}
+
+/* Make inputs and selects bigger */
+.manage-card input[type="text"],
+.manage-card input[type="number"],
+.manage-card select {
+  font-size: 1.15rem !important;
+  padding: 16px 20px !important;
+  min-height: 50px;
+}
+
+/* Make placeholder text bigger */
+.manage-card input::placeholder {
+  font-size: 1.1rem !important;
+}
+
+/* Make buttons bigger */
+.manage-btn {
+  font-size: 1.3rem !important;
+  padding: 18px 36px !important;
+  margin-top: 20px !important;
+  min-height: 60px;
+}
+
+/* Make the "Sort by" and "Order" labels bigger */
+.manage-card .form-group label {
+  font-size: 1.15rem !important;
+}
+
+/* Increase spacing in form rows */
+.manage-card .form-row {
+  gap: 20px !important;
+  margin-bottom: 24px !important;
+}
+
+/* Make paragraph text bigger */
+.manage-card p {
+  font-size: 1.1rem !important;
+  line-height: 1.8 !important;
+}
+
+/* Make the grid spacing bigger */
+.manage-grid {
+  gap: 40px !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .manage-card {
+    padding: 32px 28px !important;
+    min-height: 350px;
+  }
+  
+  .manage-card h2 {
+    font-size: 1.5rem !important;
+  }
+  
+  .manage-card label {
+    font-size: 1.1rem !important;
+  }
+  
+  .manage-card input[type="text"],
+  .manage-card input[type="number"],
+  .manage-card select {
+    font-size: 1.05rem !important;
+    padding: 14px 18px !important;
+  }
+  
+  .manage-btn {
+    font-size: 1.15rem !important;
+    padding: 16px 32px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .manage-card {
+    padding: 28px 24px !important;
+  }
+  
+  .manage-card h2 {
+    font-size: 1.3rem !important;
+  }
+  
+  .manage-card label {
+    font-size: 1rem !important;
+  }
+}/* ===== MAKE MANAGE PAGE CARDS AND TEXT BIGGER ===== */
+/* Add this to the END of your styles.css file */
+
+/* Make the cards bigger */
+.manage-card {
+  padding: 40px 36px !important;
+  min-height: 400px;
+}
+
+/* Make card headings bigger */
+.manage-card h2 {
+  font-size: 1.8rem !important;
+  margin-bottom: 32px !important;
+  padding-bottom: 20px !important;
+}
+
+/* Make form labels bigger */
+.manage-card label {
+  font-size: 1.2rem !important;
+  margin-bottom: 10px !important;
+  font-weight: 700;
+}
+
+/* Make inputs and selects bigger */
+.manage-card input[type="text"],
+.manage-card input[type="number"],
+.manage-card select {
+  font-size: 1.15rem !important;
+  padding: 16px 20px !important;
+  min-height: 50px;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Make placeholder text bigger */
+.manage-card input::placeholder {
+  font-size: 1.1rem !important;
+}
+
+/* Make buttons bigger */
+.manage-btn {
+  font-size: 1.3rem !important;
+  padding: 18px 36px !important;
+  margin-top: 20px !important;
+  min-height: 60px;
+}
+
+/* Make the "Sort by" and "Order" labels bigger */
+.manage-card .form-group label {
+  font-size: 1.15rem !important;
+}
+
+/* Increase spacing in form rows and ensure proper containment */
+.manage-card .form-row {
+  gap: 20px !important;
+  margin-bottom: 24px !important;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+}
+
+.manage-card .form-group {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* Make paragraph text bigger */
+.manage-card p {
+  font-size: 1.1rem !important;
+  line-height: 1.8 !important;
+}
+
+/* Make the grid spacing bigger */
+.manage-grid {
+  gap: 40px !important;
+}
+
+/* Ensure table container is scrollable */
+.table-container {
+  overflow-x: auto !important;
+  width: 100% !important;
+  margin-bottom: 20px !important;
+}
+
+/* Ensure results section is wide enough */
+.results-section {
+  width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+/* Make table responsive and fully visible */
+.eoi-table {
+  min-width: 1200px !important;
+  width: 100% !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .manage-card {
+    padding: 32px 28px !important;
+    min-height: 350px;
+  }
+  
+  .manage-card h2 {
+    font-size: 1.5rem !important;
+  }
+  
+  .manage-card label {
+    font-size: 1.1rem !important;
+  }
+  
+  .manage-card input[type="text"],
+  .manage-card input[type="number"],
+  .manage-card select {
+    font-size: 1.05rem !important;
+    padding: 14px 18px !important;
+  }
+  
+  .manage-btn {
+    font-size: 1.15rem !important;
+    padding: 16px 32px !important;
+  }
+  
+  .manage-card .form-row {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .manage-card {
+    padding: 28px 24px !important;
+  }
+  
+  .manage-card h2 {
+    font-size: 1.3rem !important;
+  }
+  
+  .manage-card label {
+    font-size: 1rem !important;
+  }
+}
+/* ===== MAKE MANAGE PAGE CARDS AND TEXT BIGGER ===== */
+/* Add this to the END of your styles.css file */
+
+/* Make the cards bigger */
+.manage-card {
+  padding: 40px 36px !important;
+  min-height: 400px;
+}
+
+/* Make card headings bigger */
+.manage-card h2 {
+  font-size: 1.8rem !important;
+  margin-bottom: 32px !important;
+  padding-bottom: 20px !important;
+}
+
+/* Make form labels bigger */
+.manage-card label {
+  font-size: 1.2rem !important;
+  margin-bottom: 10px !important;
+  font-weight: 700;
+}
+
+/* Make inputs and selects bigger */
+.manage-card input[type="text"],
+.manage-card input[type="number"],
+.manage-card select {
+  font-size: 1.15rem !important;
+  padding: 16px 20px !important;
+  min-height: 50px;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Make placeholder text bigger */
+.manage-card input::placeholder {
+  font-size: 1.1rem !important;
+}
+
+/* Make buttons bigger */
+.manage-btn {
+  font-size: 1.3rem !important;
+  padding: 18px 36px !important;
+  margin-top: 20px !important;
+  min-height: 60px;
+}
+
+/* Make the "Sort by" and "Order" labels bigger */
+.manage-card .form-group label {
+  font-size: 1.15rem !important;
+}
+
+/* Increase spacing in form rows and ensure proper containment */
+.manage-card .form-row {
+  gap: 20px !important;
+  margin-bottom: 24px !important;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+}
+
+.manage-card .form-group {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* Make paragraph text bigger */
+.manage-card p {
+  font-size: 1.1rem !important;
+  line-height: 1.8 !important;
+}
+
+/* Make the grid spacing bigger */
+.manage-grid {
+  gap: 40px !important;
+}
+
+/* Ensure table container is scrollable */
+.table-container {
+  overflow-x: auto !important;
+  width: 100% !important;
+  margin-bottom: 20px !important;
+}
+
+/* Ensure results section is wide enough */
+.results-section {
+  width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+/* Make table responsive and fully visible */
+.eoi-table {
+  min-width: 1200px !important;
+  width: 100% !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .manage-card {
+    padding: 32px 28px !important;
+    min-height: 350px;
+  }
+  
+  .manage-card h2 {
+    font-size: 1.5rem !important;
+  }
+  
+  .manage-card label {
+    font-size: 1.1rem !important;
+  }
+  
+  .manage-card input[type="text"],
+  .manage-card input[type="number"],
+  .manage-card select {
+    font-size: 1.05rem !important;
+    padding: 14px 18px !important;
+  }
+  
+  .manage-btn {
+    font-size: 1.15rem !important;
+    padding: 16px 32px !important;
+  }
+  
+  .manage-card .form-row {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .manage-card {
+    padding: 28px 24px !important;
+  }
+  
+  .manage-card h2 {
+    font-size: 1.3rem !important;
+  }
+  
+  .manage-card label {
+    font-size: 1rem !important;
+  }
+}
 /* ai generated to make page much more aesthetic*/

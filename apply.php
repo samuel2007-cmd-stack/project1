@@ -47,7 +47,7 @@
                 <br><br>
 
                 <label for="phone">Phone Number</label>
-                <input type="tel" id="phone" name="phone" maxlength="8" required>
+                <input type="tel" id="phone" name="phone" maxlength="12" required>
                 <br><br>
             </fieldset>
 
@@ -58,6 +58,9 @@
 
                 <input type="radio" id="female" name="gender" value="female">
                 <label for="female">Female</label>
+
+                <input type="radio" id="other" name="gender" value="other">
+                <label for="other">Other</label>
             </fieldset>
 
             <fieldset>
@@ -72,7 +75,7 @@
                 <br><br>
 
                 <label for="postcode">Postcode</label>
-                <input type="text" id="postcode" name="postcode" maxlength="2" inputmode="numeric" required>
+                <input type="text" id="postcode" name="postcode" maxlength="4" inputmode="numeric" placeholder="4 digits" required>
                 <br><br>
 
                 <label for="city">City</label>

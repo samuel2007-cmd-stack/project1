@@ -247,31 +247,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
             $output = fopen('php://output', 'w');
             
-            // CSV Headers
-            fputcsv($output, array('EOI Number', 'Job Reference', 'First Name', 'Last Name', 'DOB', 'Gender', 
+            // CSV Headers - REMOVED dob and gender
+            fputcsv($output, array('EOI Number', 'Job Reference', 'First Name', 'Last Name', 
                                    'Street Address', 'Suburb/Town', 'State', 'Postcode', 'Email', 'Phone', 
                                    'Skill 1', 'Skill 2', 'Skill 3', 'Skill 4', 'Other Skills', 'Status', 'Created At'));
             
-            // CSV Data
+            // CSV Data - REMOVED dob and gender
             foreach ($results as $row) {
                 fputcsv($output, array(
                     $row['EOInumber'],
                     $row['job_reference'],
                     $row['first_name'],
                     $row['last_name'],
-                    $row['dob'],
-                    $row['gender'],
                     $row['street_address'],
                     $row['suburb_town'],
                     $row['state'],
                     $row['postcode'],
                     $row['email'],
                     $row['phone'],
-                    $row['skill1'],
-                    $row['skill2'],
-                    $row['skill3'],
-                    $row['skill4'],
-                    $row['other_skills'],
+                    $row['skill1'] ?? '',
+                    $row['skill2'] ?? '',
+                    $row['skill3'] ?? '',
+                    $row['skill4'] ?? '',
+                    $row['other_skills'] ?? '',
                     $row['status'],
                     $row['created_at']
                 ));
@@ -294,6 +292,12 @@ closeDatabaseConnection($conn);
     <title>Manage EOI - Control Alt Elite</title>
     <link rel="stylesheet" href="styles/styles.css">
     <style>
+        .manage-card h2 {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+        
         .view-details-btn {
             background: #3b82f6;
             color: white;
@@ -538,14 +542,6 @@ closeDatabaseConnection($conn);
                                         <h3 style="margin-bottom: 16px; color: #1e293b;">Complete EOI Details - #<?php echo htmlspecialchars($row['EOInumber']); ?></h3>
                                         <div class="details-grid">
                                             <div class="detail-item">
-                                                <div class="detail-label">Date of Birth</div>
-                                                <div class="detail-value"><?php echo htmlspecialchars($row['dob']); ?></div>
-                                            </div>
-                                            <div class="detail-item">
-                                                <div class="detail-label">Gender</div>
-                                                <div class="detail-value"><?php echo htmlspecialchars($row['gender']); ?></div>
-                                            </div>
-                                            <div class="detail-item">
                                                 <div class="detail-label">Street Address</div>
                                                 <div class="detail-value"><?php echo htmlspecialchars($row['street_address']); ?></div>
                                             </div>
@@ -563,23 +559,23 @@ closeDatabaseConnection($conn);
                                             </div>
                                             <div class="detail-item">
                                                 <div class="detail-label">Skill 1</div>
-                                                <div class="detail-value"><?php echo $row['skill1'] ? htmlspecialchars($row['skill1']) : 'N/A'; ?></div>
+                                                <div class="detail-value"><?php echo isset($row['skill1']) && $row['skill1'] ? htmlspecialchars($row['skill1']) : 'N/A'; ?></div>
                                             </div>
                                             <div class="detail-item">
                                                 <div class="detail-label">Skill 2</div>
-                                                <div class="detail-value"><?php echo $row['skill2'] ? htmlspecialchars($row['skill2']) : 'N/A'; ?></div>
+                                                <div class="detail-value"><?php echo isset($row['skill2']) && $row['skill2'] ? htmlspecialchars($row['skill2']) : 'N/A'; ?></div>
                                             </div>
                                             <div class="detail-item">
                                                 <div class="detail-label">Skill 3</div>
-                                                <div class="detail-value"><?php echo $row['skill3'] ? htmlspecialchars($row['skill3']) : 'N/A'; ?></div>
+                                                <div class="detail-value"><?php echo isset($row['skill3']) && $row['skill3'] ? htmlspecialchars($row['skill3']) : 'N/A'; ?></div>
                                             </div>
                                             <div class="detail-item">
                                                 <div class="detail-label">Skill 4</div>
-                                                <div class="detail-value"><?php echo $row['skill4'] ? htmlspecialchars($row['skill4']) : 'N/A'; ?></div>
+                                                <div class="detail-value"><?php echo isset($row['skill4']) && $row['skill4'] ? htmlspecialchars($row['skill4']) : 'N/A'; ?></div>
                                             </div>
                                             <div class="detail-item" style="grid-column: 1 / -1;">
                                                 <div class="detail-label">Other Skills</div>
-                                                <div class="detail-value"><?php echo $row['other_skills'] ? htmlspecialchars($row['other_skills']) : 'None specified'; ?></div>
+                                                <div class="detail-value"><?php echo isset($row['other_skills']) && $row['other_skills'] ? htmlspecialchars($row['other_skills']) : 'None specified'; ?></div>
                                             </div>
                                             <div class="detail-item">
                                                 <div class="detail-label">Application Date</div>
