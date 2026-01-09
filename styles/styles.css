@@ -24,18 +24,30 @@
   --transition: all 0.3s ease;
 }
 /* ===== BIGGER TEXT SIZES FOR ALL PAGES ===== */
-
 /* Base body text */
 body {
-  font-size: 18px;
+  font-size: 28px;
 }
 
 /* All paragraph text */
 p {
-  font-size: 1.2rem;
-  line-height: 1.8;
+  font-size: 1.8rem;
+  line-height: 2;
 }
 
+/* Force Comic Sans MS on ALL elements */
+* {
+  font-family: 'Comic Sans MS', 'Comic Sans', cursive !important;
+}
+
+/* Make everything slightly bigger */
+h1 { font-size: 4rem !important; }
+h2 { font-size: 3.5rem !important; }
+h3 { font-size: 2.5rem !important; }
+h4 { font-size: 2rem !important; }
+p, li, td, th, label, input, textarea, select, button { 
+  font-size: 1.3rem !important; 
+}
 /* Main headings */
 h1 {
   font-size: 3.5rem;
@@ -82,21 +94,19 @@ h4 {
 
 /* Overview text */
 .overview-text p {
-  font-size: 1.3rem;
-  line-height: 2;
+  font-size: 1.9rem;
+  line-height: 2.2;
 }
-
 /* Service and value cards */
 .service-card h3,
 .value-item h3 {
   font-size: 1.8rem;
   font-weight: 800;
 }
-
 .service-card p,
 .value-item p {
-  font-size: 1.2rem;
-  line-height: 1.9;
+  font-size: 1.7rem;
+  line-height: 2.1;
 }
 
 /* Job listings */
@@ -118,14 +128,17 @@ h4 {
 .job-body h2 {
   font-size: 1.8rem;
 }
-
+/* Make ALL paragraph text much bigger across entire site */
+p, li, td, span, div {
+  font-size: 1.8rem !important;
+  line-height: 2 !important;
+}
 .job-body p,
 .job-body ul,
 .job-body ol {
-  font-size: 1.15rem;
-  line-height: 1.9;
+  font-size: 1.7rem;
+  line-height: 2.1;
 }
-
 /* Right aside */
 .right-aside h3 {
   font-size: 1.8rem;
@@ -1403,10 +1416,10 @@ form button {
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
   line-height: 1.6;
   color: var(--neutral-700);
-  font-size: 16px;
+  font-size: 20px;
   background: #f0f4f8;
 }
 
@@ -1427,61 +1440,60 @@ body {
   top: 0;
   z-index: 1000;
 }
-
 .header-flex {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 48px;
-  max-width: 1400px;
-  margin: 0 auto;
+  padding: 24px 48px;
+  max-width: 100%;
+  margin: 0;
   transition: all 0.3s ease;
 }
-
 .logo-container {
   display: flex;
   align-items: center;
   gap: 16px;
+  margin-right: auto;
 }
-
 .logo {
-  height: 100px;
+  height: 140px;
   width: auto;
+  filter: brightness(1.2) contrast(1.1);
 }
 
 .logo-container h1 {
-  font-size: 2.5rem;  /* Bigger text */
+  font-size: 3.5rem;  /* Much bigger text */
   font-weight: 800;
   color: #ffffff;
   text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
-  letter-spacing: 0.5px;  /* Better spacing */
+  letter-spacing: 0.5px;
 }
 
 /* ===== ENHANCED NAVIGATION WITH BETTER COLORS ===== */
+
 .nav-menu {
   list-style: none;
   display: flex;
-  gap: 8px;  /* Better spacing between items */
+  gap: 40px;
   margin: 0;
   padding: 0;
   align-items: center;
 }
-
 .nav-menu a {
-  padding: 12px 24px;  /* More padding */
-  font-size: 1rem;  /* Slightly bigger text */
-  font-weight: 500;
+  padding: 16px 20px;
+  font-size: 1.4rem;
+  font-weight: 600;
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  color: #d1d5db;  /* Softer gray */
-  border-radius: 6px;  /* Less rounded, more professional */
+  color: #ffffff;
+  border-radius: 6px;
   transition: all 0.3s ease;
-  border: 1px solid transparent;  /* Prepare for hover effect */
+  border: 1px solid transparent;
+  white-space: nowrap;
 }
-
 .nav-menu a:hover {
   color: white;
   background: rgba(59, 130, 246, 0.2);  /* Subtle blue glow */
