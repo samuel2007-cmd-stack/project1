@@ -28,6 +28,22 @@ $result = $conn->query($sql);
 
 <main>
 
+<!-- ================= ASIDE: Why Work With Us ================= -->
+<aside class="right-aside">
+  <h3 id="aside-heading">Why Work With Us?</h3>
+  <p class="aside-note">At Control Alt Elite, we believe in creating a workplace where people feel valued, supported, 
+and motivated to grow. Joining our team means being part of a company that invests in your 
+skills and encourages your ideas. We bring: </p>
+  <ul>
+    <li>Supportive and collaborative work culture</li>
+    <li>Opportunities for career growth and upskilling</li>
+    <li>Competitive salary packages and performance bonuses</li>
+    <li>Flexible work arrangements depending on the role</li>
+    <li>Work on real-world, impactful technology projects</li>
+  </ul>
+  <p><strong>Apply now to join us and build your future with Control Alt Elite.</strong></p>
+</aside>
+
 <?php if ($result && $result->num_rows > 0): ?>
 
 <?php while ($job = $result->fetch_assoc()): ?>
@@ -111,14 +127,14 @@ $result = $conn->query($sql);
 </body>
 </html>
 
-
 <!-- ================= REFERENCES & AI DISCLOSURE ================= -->
 <!-- 
 1. Layout inspiration source:
-   https://themewagon.github.io/jobfinderportal/job_listing.html
+   https://themewagon.github.io/jobfinderportal/job_listing.html
 
 2. Job descriptions generated with GenAI (ChatGPT).
-   Prompt used:
-   "I need detailed and realistic job descriptions for different IT roles 
-   including Software Developer, Cyber Security Analyst, Cloud Engineer, 
-   and Network Administrator."
+   Prompt used:
+   "I need detailed and realistic job descriptions for different IT roles 
+   including Software Developer, Cyber Security Analyst, Cloud Engineer, 
+   and Network Administrator."
+-->
