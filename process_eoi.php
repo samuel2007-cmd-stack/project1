@@ -1,15 +1,29 @@
 <?php
+/**
+ * Process EOI Form Submission
+ * Validates and stores job application data including DOB, Gender, and Zone
+ * Includes CSRF protection and comprehensive validation
+ */
+
 session_start();
 
 // Prevent direct access - only allow POST requests
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
-    // Debug: Log the request method
     error_log("Non-POST request to process_eoi.php: " . $_SERVER["REQUEST_METHOD"]);
     header("Location: apply.php");
     exit();
 }
 
 require_once 'settings.php';
+
+// ============================================================================
+// CSRF VALIDATION
+// ============================================================================
+
+// Validate CSRF token first for security
+if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
+    die("Invalid security token. Please submit the form again.");
+}
 
 // Check database connection
 if (!isset($conn) || !$conn) {
@@ -19,6 +33,10 @@ if (!isset($conn) || !$conn) {
 // Initialize errors array
 $errors = array();
 
+// ============================================================================
+// SANITIZE INPUT DATA
+// ============================================================================
+
 // Sanitize and retrieve form data
 $job_ref = isset($_POST["ref"]) ? sanitizeInput($_POST["ref"]) : "";
 $firstname = isset($_POST["firstname"]) ? sanitizeInput($_POST["firstname"]) : "";
@@ -27,6 +45,7 @@ $dob = isset($_POST["dob"]) ? sanitizeInput($_POST["dob"]) : "";
 $gender = isset($_POST["gender"]) ? sanitizeInput($_POST["gender"]) : "";
 $streetaddress = isset($_POST["streetaddress"]) ? sanitizeInput($_POST["streetaddress"]) : "";
 $suburb = isset($_POST["suburb"]) ? sanitizeInput($_POST["suburb"]) : "";
+$zone = isset($_POST["zone"]) ? sanitizeInput($_POST["zone"]) : "";
 $postcode = isset($_POST["postcode"]) ? sanitizeInput($_POST["postcode"]) : "";
 $city = isset($_POST["city"]) ? sanitizeInput($_POST["city"]) : "";
 $email = isset($_POST["email"]) ? sanitizeInput($_POST["email"]) : "";
@@ -78,8 +97,6 @@ if (empty($dob)) {
     }
 }
 
-// Note: Date of birth is validated but not stored in database
-
 // Validate Gender
 if (empty($gender)) {
     $errors[] = "Gender is required.";
@@ -87,53 +104,56 @@ if (empty($gender)) {
     $errors[] = "Invalid gender selection.";
 }
 
-// Note: Gender is validated but not stored in database
-
 // Validate Street Address
 if (empty($streetaddress)) {
     $errors[] = "Street address is required.";
-} elseif (!validateAddress($streetaddress, 40)) {
+} elseif (strlen($streetaddress) > 40) {
     $errors[] = "Street address must be maximum 40 characters.";
 }
 
-// Validate Suburb/Town
+// Validate Suburb
 if (empty($suburb)) {
     $errors[] = "Suburb/Town is required.";
-} elseif (!validateAddress($suburb, 40)) {
+} elseif (strlen($suburb) > 40) {
     $errors[] = "Suburb/Town must be maximum 40 characters.";
+}
+
+// Validate Zone
+if (empty($zone)) {
+    $errors[] = "Zone is required.";
+} elseif (strlen($zone) > 2) {
+    $errors[] = "Zone must be maximum 2 characters.";
 }
 
 // Validate Postcode
 if (empty($postcode)) {
     $errors[] = "Postcode is required.";
-} elseif (!validatePostcode($postcode)) {
+} elseif (!preg_match('/^\d{4}$/', $postcode)) {
     $errors[] = "Postcode must be exactly 4 digits.";
 }
 
-// Validate City/State
+// Validate City
 if (empty($city)) {
-    $errors[] = "City/State is required.";
-} elseif (!validateCity($city)) {
-    $errors[] = "Invalid city/state selection.";
+    $errors[] = "City is required.";
 }
 
 // Validate Email
 if (empty($email)) {
-    $errors[] = "Email address is required.";
-} elseif (!validateEmail($email)) {
-    $errors[] = "Invalid email address format.";
+    $errors[] = "Email is required.";
+} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $errors[] = "Invalid email format.";
 }
 
-// Validate Phone Number
+// Validate Phone
 if (empty($phone)) {
     $errors[] = "Phone number is required.";
-} elseif (!validatePhone($phone)) {
-    $errors[] = "Phone number must be 8 to 12 digits.";
+} elseif (!preg_match('/^\d{8,12}$/', $phone)) {
+    $errors[] = "Phone number must be 8-12 digits.";
 }
 
-// Validate Skills - at least one must be selected
-if (!$skill1 && !$skill2 && !$skill3 && !$skill4) {
-    $errors[] = "At least one technical skill must be selected.";
+// Validate Skills (at least one required)
+if (empty($skill1) && empty($skill2) && empty($skill3) && empty($skill4)) {
+    $errors[] = "Please select at least one technical skill.";
 }
 
 // ============================================================================
@@ -171,16 +191,16 @@ if (!empty($errors)) {
                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
                 </svg>
                 <div>
-                    <p style="font-weight: 700; margin-bottom: 12px;">Please correct the following errors:</p>
-                    <ul style="list-style: none; padding: 0;">
+                    <p class="error-list-title">Please correct the following errors:</p>
+                    <ul class="error-list">
                         <?php foreach ($errors as $error): ?>
-                            <li style="margin: 8px 0;">• <?php echo htmlspecialchars($error); ?></li>
+                            <li><?php echo htmlspecialchars($error); ?></li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
             </div>
             
-            <a href="apply.php" class="auth-btn" style="margin-top: 24px;">
+            <a href="apply.php" class="auth-btn button-spacing">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
                     <polyline points="12 19 5 12 12 5"></polyline>
@@ -203,7 +223,7 @@ if (!empty($errors)) {
 // DATABASE OPERATIONS
 // ============================================================================
 
-// Create table if it doesn't exist
+// Create table if it doesn't exist (with DOB, Gender, and Zone columns)
 $table_check = mysqli_query($conn, "SHOW TABLES LIKE 'eoi'");
 if (mysqli_num_rows($table_check) == 0) {
     $create_table_sql = "CREATE TABLE eoi (
@@ -211,9 +231,12 @@ if (mysqli_num_rows($table_check) == 0) {
         job_reference VARCHAR(10) NOT NULL,
         first_name VARCHAR(20) NOT NULL,
         last_name VARCHAR(20) NOT NULL,
+        gender ENUM('male', 'female', 'other') NULL,
+        dob VARCHAR(10) NULL,
         street_address VARCHAR(40) NOT NULL,
         suburb_town VARCHAR(40) NOT NULL,
         state VARCHAR(40) NOT NULL,
+        zone VARCHAR(3) NULL,
         postcode VARCHAR(4) NOT NULL,
         email VARCHAR(255) NOT NULL,
         phone VARCHAR(12) NOT NULL,
@@ -224,7 +247,7 @@ if (mysqli_num_rows($table_check) == 0) {
         other_skills TEXT NULL,
         status ENUM('New', 'Current', 'Final') DEFAULT 'New' NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )";
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
     
     if (!mysqli_query($conn, $create_table_sql)) {
         error_log("Error creating table: " . mysqli_error($conn));
@@ -233,10 +256,10 @@ if (mysqli_num_rows($table_check) == 0) {
 }
 
 // Prepare SQL statement with parameterized query to prevent SQL injection
-$insert_sql = "INSERT INTO eoi (job_reference, first_name, last_name,
-                street_address, suburb_town, state, postcode, email, phone, 
+$insert_sql = "INSERT INTO eoi (job_reference, first_name, last_name, gender, dob,
+                street_address, suburb_town, state, zone, postcode, email, phone, 
                 skill1, skill2, skill3, skill4, other_skills, status) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'New')";
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'New')";
 
 $stmt = mysqli_prepare($conn, $insert_sql);
 
@@ -245,14 +268,17 @@ if (!$stmt) {
     die("An error occurred while processing your application. Please try again later.");
 }
 
-// Bind parameters
-mysqli_stmt_bind_param($stmt, "ssssssssssssss", 
+// Bind parameters to prevent SQL injection - INCLUDING GENDER, DOB, AND ZONE
+mysqli_stmt_bind_param($stmt, "sssssssssssssssss", 
     $job_ref, 
     $firstname, 
-    $lastname, 
+    $lastname,
+    $gender,        
+    $dob,          
     $streetaddress, 
     $suburb, 
     $city,
+    $zone,          // ADDED ZONE
     $postcode,
     $email, 
     $phone, 
@@ -265,6 +291,7 @@ mysqli_stmt_bind_param($stmt, "ssssssssssssss",
 
 // Execute the statement
 if (mysqli_stmt_execute($stmt)) {
+    // Get the auto-generated EOI number
     $eoi_number = mysqli_insert_id($conn);
     
     // ============================================================================
@@ -298,18 +325,18 @@ if (mysqli_stmt_execute($stmt)) {
                     <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
                 <div>
-                    <p style="font-weight: 700; font-size: 1.3rem; margin-bottom: 16px;">Application Successfully Submitted!</p>
-                    <p style="margin: 12px 0;">Your Expression of Interest has been received and recorded.</p>
-                    <div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); padding: 20px; border-radius: 12px; margin: 20px 0; border: 2px solid #3b82f6;">
-                        <p style="font-size: 1.1rem; color: #1e40af; font-weight: 600;">Your Reference Number:</p>
-                        <p style="font-size: 2.5rem; color: #1e40af; font-weight: 900; margin: 8px 0;">EOI #<?php echo htmlspecialchars($eoi_number); ?></p>
+                    <p class="success-title">Application Successfully Submitted!</p>
+                    <p class="success-text">Your Expression of Interest has been received and recorded.</p>
+                    <div class="eoi-reference-box">
+                        <p class="eoi-reference-label">Your Reference Number:</p>
+                        <p class="eoi-reference-number">EOI #<?php echo htmlspecialchars($eoi_number); ?></p>
                     </div>
-                    <p style="margin: 12px 0;">Please save this reference number for your records.</p>
-                    <p style="margin: 12px 0;">We will contact you at <strong><?php echo htmlspecialchars($email); ?></strong></p>
+                    <p class="success-text">Please save this reference number for your records.</p>
+                    <p class="success-text">We will contact you at <strong><?php echo htmlspecialchars($email); ?></strong></p>
                 </div>
             </div>
             
-            <a href="index.php" class="auth-btn" style="margin-top: 24px;">
+            <a href="index.php" class="auth-btn button-spacing">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                     <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -325,12 +352,14 @@ if (mysqli_stmt_execute($stmt)) {
     </html>
     <?php
 } else {
+    // Log error and show user-friendly message
     error_log("Database execution error: " . mysqli_stmt_error($stmt));
     echo "<h1>Error</h1>";
     echo "<p>An error occurred while submitting your application. Please try again later.</p>";
     echo "<a href='apply.php'>Back to Application Form</a>";
 }
 
+// Clean up
 mysqli_stmt_close($stmt);
 closeDatabaseConnection($conn);
 ?>

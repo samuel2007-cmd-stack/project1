@@ -1,3 +1,19 @@
+<?php
+/**
+ * Job Application Form
+ * Control Alt Elite - Apply for positions
+ */
+
+// Start session and generate CSRF token
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once 'settings.php';
+
+// Generate CSRF token for form protection
+$csrf_token = generateCSRFToken();
+?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -26,6 +42,9 @@
         <form action="process_eoi.php" 
               method="post" 
               novalidate="novalidate">
+
+            <!-- CSRF Token for security -->
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
 
             <fieldset>
                 <legend>PERSONAL DETAILS</legend>
@@ -73,6 +92,8 @@
                 <label for="suburb">Suburb/Town</label>
                 <input type="text" id="suburb" name="suburb" maxlength="40" required>
                 <br><br>
+                <label for="zone">Zone</label>
+                <input type="text" id="zone" name="zone" maxlength="2" required>
 
                 <label for="postcode">Postcode</label>
                 <input type="text" id="postcode" name="postcode" maxlength="4" inputmode="numeric" placeholder="4 digits" required>

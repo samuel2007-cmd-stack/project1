@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once 'settings.php';
 
 $error = "";
@@ -114,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         <?php endif; ?>
         
-        <form method="post" class="auth-form">
+        <form method="post" action="register.php" class="auth-form" novalidate>
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" placeholder="Choose a username" required>

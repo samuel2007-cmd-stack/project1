@@ -1,3 +1,25 @@
+<?php
+/**
+ * ============================================================================
+ * PAGE: About Us
+ * COMPANY: Control Alt Elite
+ * PROJECT: COS10026 Web Technology Project - Part 2
+ * ============================================================================
+ * 
+ * Description: Displays team member information, contributions, interests,
+ *              and group introduction with professional team presentation
+ * 
+ * Team Members:
+ * - Samuel Moraes (106205571)
+ * - Anantroop Singh Sahi (106221933)
+ * - Beatrice Thomas (106194132)
+ * ============================================================================
+ */
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -133,3 +155,57 @@
 
 </body>
 </html>
+
+<!--
+============================================================================
+IMPROVEMENT SUGGESTIONS FOR ABOUT US PAGE
+============================================================================
+
+VISUAL ENHANCEMENTS:
+- Add smooth scroll animations when sections come into view
+- Implement parallax effect on the banner background image
+- Add hover effects on team member cards with subtle lift/shadow
+- Include animated progress bars for individual skills/contributions
+- Add timeline visualization for project development milestones
+
+INTERACTIVITY:
+- Create expandable/collapsible contribution sections
+- Add modal popups with detailed team member bios when clicked
+- Implement smooth transitions between sections
+- Add "Back to Top" floating button for better navigation
+- Include social media links for each team member
+
+CONTENT ENHANCEMENTS:
+- Add individual profile photos for each team member
+- Include technology stack icons/badges for skills
+- Add testimonials or project highlights section
+- Create interactive timeline of team formation and project progress
+- Include downloadable team resume/CV section
+
+ACCESSIBILITY:
+- Ensure all images have descriptive alt text
+- Add skip navigation links for screen readers
+- Implement keyboard navigation for interactive elements
+- Ensure color contrast meets WCAG AA standards
+- Add ARIA labels for all interactive components
+
+RESPONSIVE DESIGN:
+- Optimize layout for mobile devices (stack cards vertically)
+- Ensure images scale properly on different screen sizes
+- Test and adjust font sizes for readability on small screens
+- Implement touch-friendly interaction areas (minimum 44x44px)
+
+PERFORMANCE:
+- Lazy load images below the fold
+- Compress and optimize all images (WebP format)
+- Minify CSS and implement critical CSS inline
+- Add loading indicators for dynamic content
+
+SEO OPTIMIZATION:
+- Add structured data markup for team members (Schema.org)
+- Optimize meta descriptions with relevant keywords
+- Include Open Graph tags for social media sharing
+- Add breadcrumb navigation with structured data
+
+============================================================================
+-->

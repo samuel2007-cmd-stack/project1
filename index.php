@@ -6,6 +6,10 @@
  * Part of COS10026 Web Technology Project Part 2
  * Control Alt Elite - Group Project
  */
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

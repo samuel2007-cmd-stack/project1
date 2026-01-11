@@ -1,8 +1,28 @@
 <?php
+/**
+ * Job Listings Page
+ * Displays available job positions from database
+ * Includes error handling and proper connection management
+ */
+
 require_once 'settings.php';
 
+// Check if database connection exists
+if (!$conn) {
+    die("Database connection failed. Please try again later.");
+}
+
+// Query to fetch all jobs
 $sql = "SELECT * FROM jobs";
 $result = $conn->query($sql);
+
+// Check if query was successful
+if (!$result) {
+    error_log("Query error in jobs.php: " . $conn->error);
+    echo "<p>Error loading job listings. Please try again later.</p>";
+    closeDatabaseConnection($conn);
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -117,12 +137,17 @@ skills and encourages your ideas. We bring: </p>
 <?php endwhile; ?>
 
 <?php else: ?>
-  <p>No job positions available at the moment.</p>
+  <p>No job positions available at the moment. Please check back later.</p>
 <?php endif; ?>
 
 </main>
 
 <?php include 'footer.inc'; ?>
+
+<?php 
+// Close database connection
+closeDatabaseConnection($conn); 
+?>
 
 </body>
 </html>
