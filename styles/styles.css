@@ -8976,3 +8976,143 @@ footer {
     border-color: #059669;
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
+/* ============================================
+   STATUS DROPDOWN STYLING
+   ============================================ */
+
+.status-dropdown {
+    padding: 8px 12px;
+    border: 2px solid var(--neutral-300);
+    border-radius: 8px;
+    background-color: white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 120px;
+}
+
+.status-dropdown:hover {
+    border-color: var(--primary);
+    background-color: var(--neutral-50);
+}
+
+.status-dropdown:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Status-specific dropdown colors */
+.status-dropdown option[value="New"] {
+    color: #3b82f6;
+}
+
+.status-dropdown option[value="Current"] {
+    color: #f59e0b;
+}
+
+.status-dropdown option[value="Final"] {
+    color: #10b981;
+}
+
+/* ============================================
+   ADDITIONAL METRIC CARD COLORS
+   ============================================ */
+
+.metric-green {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border-left: 4px solid #10b981;
+}
+
+.metric-green .metric-value {
+    color: #065f46;
+}
+
+.metric-green .metric-title {
+    color: #047857;
+}
+
+.metric-yellow {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-left: 4px solid #f59e0b;
+}
+
+.metric-yellow .metric-value {
+    color: #92400e;
+}
+
+.metric-yellow .metric-title {
+    color: #b45309;
+}
+
+.metric-success {
+    background: linear-gradient(135deg, #d1fae5 0%, #6ee7b7 100%);
+    border-left: 4px solid #059669;
+}
+
+.metric-success .metric-value {
+    color: #064e3b;
+}
+
+.metric-success .metric-title {
+    color: #047857;
+}
+
+/* ============================================
+   SUCCESS/ERROR MESSAGES IN MANAGE PAGE
+   ============================================ */
+
+.alert-message {
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert-success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border-left: 4px solid #10b981;
+}
+
+.alert-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+}
+
+.alert-message svg {
+    flex-shrink: 0;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+    .status-dropdown {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+}

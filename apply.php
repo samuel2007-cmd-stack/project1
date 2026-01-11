@@ -66,7 +66,7 @@ $csrf_token = generateCSRFToken();
                 <br><br>
 
                 <label for="phone">Phone Number</label>
-                <input type="tel" id="phone" name="phone" maxlength="12" required>
+                <input type="tel" id="phone" name="phone" maxlength="8" required>
                 <br><br>
             </fieldset>
 
@@ -93,7 +93,7 @@ $csrf_token = generateCSRFToken();
                 <input type="text" id="suburb" name="suburb" maxlength="40" required>
                 <br><br>
                 <label for="zone">Zone</label>
-                <input type="text" id="zone" name="zone" maxlength="2" required>
+                <input type="text" id="zone" name="zone" maxlength="2" inputmode="numeric" placeholder="2 digits" required>
 
                 <label for="postcode">Postcode</label>
                 <input type="text" id="postcode" name="postcode" maxlength="4" inputmode="numeric" placeholder="4 digits" required>

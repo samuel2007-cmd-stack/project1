@@ -1,7 +1,4 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 require_once 'settings.php';
 
 $error = "";
@@ -23,17 +20,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (!preg_match("/[0-9]/", $password)) {
         $error = "Password must have one number";
     } else {
-        global $host, $user, $pwd, $sql_db;
-        
-        $conn = mysqli_connect($host, $user, $pwd, $sql_db);
+        $conn = getDatabaseConnection();
         
         if (!$conn) {
-            $error = "Database connection failed: " . mysqli_connect_error();
+            $error = "Database connection failed. Please try again later.";
         } else {
             $checkStmt = mysqli_prepare($conn, "SELECT username FROM managers WHERE username=?");
             
             if (!$checkStmt) {
-                $error = "Database error: " . mysqli_error($conn);
+                error_log("Database prepare error in register.php: " . mysqli_error($conn));
+                $error = "Database error occurred. Please try again later.";
             } else {
                 mysqli_stmt_bind_param($checkStmt, "s", $username);
                 mysqli_stmt_execute($checkStmt);
@@ -49,14 +45,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $insertStmt = mysqli_prepare($conn, "INSERT INTO managers (username, password, failed_attempts) VALUES (?, ?, 0)");
                     
                     if (!$insertStmt) {
-                        $error = "Database error: " . mysqli_error($conn);
+                        error_log("Database prepare error in register.php: " . mysqli_error($conn));
+                        $error = "Database error occurred. Please try again later.";
                     } else {
                         mysqli_stmt_bind_param($insertStmt, "ss", $username, $hashed_password);
                         
                         if (mysqli_stmt_execute($insertStmt)) {
                             $success = "Registration successful! You can now login.";
                         } else {
-                            $error = "Registration failed: " . mysqli_stmt_error($insertStmt);
+                            error_log("Registration execution error: " . mysqli_stmt_error($insertStmt));
+                            $error = "Registration failed. Please try again later.";
                         }
                         
                         mysqli_stmt_close($insertStmt);
@@ -64,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             }
             
-            mysqli_close($conn);
+            closeDatabaseConnection($conn);
         }
     }
 }

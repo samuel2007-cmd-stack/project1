@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $password = $_POST['password'];
         
         if (!empty($username) && !empty($password)) {
-            $conn = mysqli_connect($host, $user, $pwd, $sql_db);
+            $conn = getDatabaseConnection(); // CRITICAL FIX: Use consistent connection method
             
             if (!$conn) {
                 $error = "Database connection failed";
@@ -65,9 +65,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     // Proceed with password verification if not locked
                     if ($error == "") {
                         if (password_verify($password, $manager['password'])) {
+                            // CRITICAL FIX: Regenerate session ID to prevent session fixation
+                            session_regenerate_id(true);
+                            
                             // Successful login - set session variables
                             $_SESSION['manager_logged_in'] = true;
                             $_SESSION['manager_username'] = $username;
+                            $_SESSION['manager_id'] = $manager['id']; // CRITICAL FIX: Store manager ID
                             
                             // Reset failed attempts on successful login
                             $resetStmt = mysqli_prepare($conn, "UPDATE managers SET failed_attempts=0, lockout_time=NULL WHERE username=?");
@@ -76,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             mysqli_stmt_close($resetStmt);
                             
                             mysqli_stmt_close($stmt);
-                            mysqli_close($conn);
+                            closeDatabaseConnection($conn); // CRITICAL FIX: Use consistent close method
                             header("Location: manage.php");
                             exit();
                         } else {
@@ -105,12 +109,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     
                     mysqli_stmt_close($stmt);
                 } else {
-                    // Username not found
+                    // CRITICAL FIX: Use constant-time comparison to prevent username enumeration
+                    // Still show generic error, but simulate password check timing
+                    $dummy_hash = '$2y$10$dummyhashtopreventtimingattacksxxxxxxxxxxxxxxxxxxxxxxxxx';
+                    password_verify($password, $dummy_hash);
                     mysqli_stmt_close($stmt);
-                    $error = "Username not found";
+                    $error = "Invalid username or password"; // CRITICAL FIX: Generic error message
                 }
                 
-                mysqli_close($conn);
+                closeDatabaseConnection($conn); // CRITICAL FIX: Use consistent close method
             }
         } else {
             $error = "Please fill in all fields";
@@ -159,12 +166,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required autocomplete="username">
             </div>
             
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
             </div>
             
             <button type="submit" class="auth-btn">

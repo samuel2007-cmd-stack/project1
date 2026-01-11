@@ -9,6 +9,13 @@ if (!isset($_SESSION['manager_logged_in'])) {
 
 require_once 'settings.php';
 
+// Get database connection
+$conn = getDatabaseConnection();
+
+if (!$conn) {
+    die("Database connection failed. Please try again later.");
+}
+
 // Initialize variables
 $message = "";
 $message_type = "";
@@ -47,270 +54,24 @@ if (!isset($_SESSION['last_search'])) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
-    // QUICK ACCEPT EOI (NEW FEATURE - HD QUALITY)
-    if (isset($_POST['quick_accept'])) {
-        $eoi_num = trim($_POST['accept_eoi_number']);
-        
-        if (!empty($eoi_num) && is_numeric($eoi_num)) {
-            $stmt = mysqli_prepare($conn, "UPDATE eoi SET status='Accepted' WHERE EOInumber=?");
-            mysqli_stmt_bind_param($stmt, "i", $eoi_num);
-            
-            if (mysqli_stmt_execute($stmt)) {
-                if (mysqli_stmt_affected_rows($stmt) > 0) {
-                    $message = "✅ EOI #" . htmlspecialchars($eoi_num) . " has been ACCEPTED successfully!";
-                    $message_type = "success";
-                    
-                    // Fetch and display the updated record
-                    $fetch_stmt = mysqli_prepare($conn, "SELECT * FROM eoi WHERE EOInumber=?");
-                    mysqli_stmt_bind_param($fetch_stmt, "i", $eoi_num);
-                    mysqli_stmt_execute($fetch_stmt);
-                    $fetch_result = mysqli_stmt_get_result($fetch_stmt);
-                    
-                    if ($row = mysqli_fetch_assoc($fetch_result)) {
-                        $results[] = $row;
-                        $search_performed = "Accepted Application - EOI #" . htmlspecialchars($eoi_num);
-                        $show_results = true;
-                    }
-                    mysqli_stmt_close($fetch_stmt);
-                } else {
-                    $message = "EOI #" . htmlspecialchars($eoi_num) . " not found";
-                    $message_type = "error";
-                }
-            } else {
-                error_log("Quick accept error: " . mysqli_stmt_error($stmt));
-                $message = "Error accepting EOI";
-                $message_type = "error";
-            }
-            mysqli_stmt_close($stmt);
-        } else {
-            $message = "Please enter a valid EOI number";
-            $message_type = "error";
-        }
-    }
-
-    // BULK ACCEPT BY JOB REFERENCE (NEW FEATURE - HD QUALITY)
-    if (isset($_POST['bulk_accept'])) {
-        $job_ref = trim($_POST['bulk_accept_job_ref']);
-        
-        if (!empty($job_ref)) {
-            // First, get count of records to be accepted (includes blank, NULL, New, Current)
-            $count_stmt = mysqli_prepare($conn, "SELECT COUNT(*) as count FROM eoi WHERE job_reference=? AND (status IS NULL OR status = '' OR status NOT IN ('Accepted', 'Final'))");
-            mysqli_stmt_bind_param($count_stmt, "s", $job_ref);
-            mysqli_stmt_execute($count_stmt);
-            $count_result = mysqli_stmt_get_result($count_stmt);
-            $count_row = mysqli_fetch_assoc($count_result);
-            $records_to_accept = $count_row['count'];
-            mysqli_stmt_close($count_stmt);
-            
-            if ($records_to_accept > 0) {
-                // Proceed with bulk acceptance - update ALL records including blank/NULL statuses
-                $stmt = mysqli_prepare($conn, "UPDATE eoi SET status='Accepted' WHERE job_reference=? AND (status IS NULL OR status = '' OR status NOT IN ('Accepted', 'Final'))");
-                mysqli_stmt_bind_param($stmt, "s", $job_ref);
-                
-                if (mysqli_stmt_execute($stmt)) {
-                    $affected = mysqli_stmt_affected_rows($stmt);
-                    if ($affected > 0) {
-                        $message = "✅ Successfully accepted $affected EOI(s) for job reference: " . htmlspecialchars($job_ref);
-                        $message_type = "success";
-                        
-                        // Fetch and display the accepted records
-                        $fetch_stmt = mysqli_prepare($conn, "SELECT * FROM eoi WHERE job_reference=? ORDER BY EOInumber DESC");
-                        mysqli_stmt_bind_param($fetch_stmt, "s", $job_ref);
-                        mysqli_stmt_execute($fetch_stmt);
-                        $fetch_result = mysqli_stmt_get_result($fetch_stmt);
-                        
-                        while ($row = mysqli_fetch_assoc($fetch_result)) {
-                            $results[] = $row;
-                        }
-                        $search_performed = "Bulk Accepted - Job Reference: " . htmlspecialchars($job_ref);
-                        $show_results = true;
-                        
-                        mysqli_stmt_close($fetch_stmt);
-                    } else {
-                        $message = "No records were updated. They may already be accepted.";
-                        $message_type = "error";
-                    }
-                } else {
-                    error_log("Bulk accept error: " . mysqli_stmt_error($stmt));
-                    $message = "Error occurred during bulk acceptance: " . mysqli_error($conn);
-                    $message_type = "error";
-                }
-                mysqli_stmt_close($stmt);
-            } else {
-                $message = "No pending records found to accept for job reference: " . htmlspecialchars($job_ref);
-                $message_type = "error";
-            }
-        } else {
-            $message = "Please enter a job reference number";
-            $message_type = "error";
-        }
-    }
+    // CRITICAL FIX: CSRF Protection for all POST requests
+    if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
+        $message = "Invalid security token. Please refresh the page and try again.";
+        $message_type = "error";
+    } else {
     
-    // LIST ALL EOIs WITH SORTING
-    if (isset($_POST['list_all'])) {
-        $sort_field = isset($_POST['sort_field']) && !empty($_POST['sort_field']) ? $_POST['sort_field'] : 'EOInumber';
-        $sort_order = isset($_POST['sort_order']) ? $_POST['sort_order'] : 'ASC';
-        
-        // Store in session
-        $_SESSION['last_search'] = array(
-            'type' => 'list_all',
-            'sort_field' => $sort_field,
-            'sort_order' => $sort_order
-        );
-        
-        // Whitelist allowed fields to prevent SQL injection
-        $allowed_fields = ['EOInumber', 'first_name', 'last_name', 'job_reference', 'status', 'created_at'];
-        $sort_field = in_array($sort_field, $allowed_fields) ? $sort_field : 'EOInumber';
-        $sort_order = ($sort_order == 'DESC') ? 'DESC' : 'ASC';
-        
-        // Get total count for pagination
-        $count_query = "SELECT COUNT(*) as total FROM eoi";
-        $count_result = mysqli_query($conn, $count_query);
-        $count_row = mysqli_fetch_assoc($count_result);
-        $total_records = $count_row['total'];
-        $total_pages = ceil($total_records / $records_per_page);
-        
-        // Properly escape the field name (even though whitelisted, extra security)
-        $safe_sort_field = mysqli_real_escape_string($conn, $sort_field);
-        $query = "SELECT * FROM eoi ORDER BY $safe_sort_field $sort_order LIMIT $records_per_page OFFSET $offset";
-        $result = mysqli_query($conn, $query);
-        
-        if ($result) {
-            if (mysqli_num_rows($result) > 0) {
-                while ($row = mysqli_fetch_assoc($result)) {
-                    $results[] = $row;
-                }
-                $search_performed = "All EOI Records (sorted by " . ucfirst(str_replace('_', ' ', $sort_field)) . " - $sort_order)";
-                $message = "Showing " . count($results) . " of $total_records total records";
-                $message_type = "success";
-                $show_results = true;
-            } else {
-                $message = "No records found in database";
-                $message_type = "error";
-            }
-        } else {
-            error_log("Database query error: " . mysqli_error($conn));
-            $message = "Error retrieving records";
-            $message_type = "error";
-        }
-    }
-
-    // SEARCH BY JOB REFERENCE
-    if (isset($_POST['search_by_job'])) {
-        $job_ref = trim($_POST['job_reference']);
-        
-        // Store in session
-        $_SESSION['last_search'] = array(
-            'type' => 'job_ref',
-            'job_ref' => $job_ref
-        );
-        
-        if (!empty($job_ref)) {
-            $stmt = mysqli_prepare($conn, "SELECT * FROM eoi WHERE job_reference=? ORDER BY EOInumber DESC");
-            mysqli_stmt_bind_param($stmt, "s", $job_ref);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
+        // QUICK ACCEPT EOI (NEW FEATURE - HD QUALITY)
+        if (isset($_POST['quick_accept'])) {
+            $eoi_num = trim($_POST['accept_eoi_number']);
             
-            if (mysqli_num_rows($result) > 0) {
-                while ($row = mysqli_fetch_assoc($result)) {
-                    $results[] = $row;
-                }
-                $search_performed = "Job Reference: " . htmlspecialchars($job_ref);
-                $message = "Found " . count($results) . " record(s) for job reference: " . htmlspecialchars($job_ref);
-                $message_type = "success";
-                $show_results = true;
-            } else {
-                $message = "No records found for job reference: " . htmlspecialchars($job_ref);
-                $message_type = "error";
-            }
-            mysqli_stmt_close($stmt);
-        } else {
-            $message = "Please enter a job reference number";
-            $message_type = "error";
-        }
-    }
-
-    // SEARCH BY NAME (FIRST, LAST, OR BOTH)
-    if (isset($_POST['search_by_name'])) {
-        $firstname = trim($_POST['first_name']);
-        $lastname = trim($_POST['last_name']);
-        
-        // Store in session
-        $_SESSION['last_search'] = array(
-            'type' => 'name',
-            'first_name' => $firstname,
-            'last_name' => $lastname
-        );
-        
-        if (!empty($firstname) || !empty($lastname)) {
-            $conditions = array();
-            $types = "";
-            $params = array();
-            $search_terms = array();
-            
-            if (!empty($firstname)) {
-                $conditions[] = "first_name LIKE ?";
-                $types .= "s";
-                $params[] = "%" . $firstname . "%";
-                $search_terms[] = "First Name: " . htmlspecialchars($firstname);
-            }
-            
-            if (!empty($lastname)) {
-                $conditions[] = "last_name LIKE ?";
-                $types .= "s";
-                $params[] = "%" . $lastname . "%";
-                $search_terms[] = "Last Name: " . htmlspecialchars($lastname);
-            }
-            
-            $query = "SELECT * FROM eoi WHERE " . implode(" AND ", $conditions) . " ORDER BY last_name, first_name";
-            $stmt = mysqli_prepare($conn, $query);
-            
-            if ($stmt) {
-                mysqli_stmt_bind_param($stmt, $types, ...$params);
-                mysqli_stmt_execute($stmt);
-                $result = mysqli_stmt_get_result($stmt);
-                
-                if (mysqli_num_rows($result) > 0) {
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        $results[] = $row;
-                    }
-                    $search_performed = implode(", ", $search_terms);
-                    $message = "Found " . count($results) . " matching applicant(s)";
-                    $message_type = "success";
-                    $show_results = true;
-                } else {
-                    $message = "No matching applicants found";
-                    $message_type = "error";
-                }
-                mysqli_stmt_close($stmt);
-            } else {
-                error_log("Database prepare error: " . mysqli_error($conn));
-                $message = "Error performing search";
-                $message_type = "error";
-            }
-        } else {
-            $message = "Please enter at least first name, last name, or both";
-            $message_type = "error";
-        }
-    }
-
-    // UPDATE EOI STATUS
-    if (isset($_POST['update_status'])) {
-        $eoi_num = trim($_POST['eoi_number']);
-        $new_status = $_POST['new_status'];
-        
-        if (!empty($eoi_num) && !empty($new_status)) {
-            // Validate EOI number is numeric
-            if (!is_numeric($eoi_num)) {
-                $message = "EOI number must be a valid number";
-                $message_type = "error";
-            } else {
-                $stmt = mysqli_prepare($conn, "UPDATE eoi SET status=? WHERE EOInumber=?");
-                mysqli_stmt_bind_param($stmt, "si", $new_status, $eoi_num);
+            if (!empty($eoi_num) && is_numeric($eoi_num)) {
+                $eoi_num = (int)$eoi_num; // CRITICAL FIX: Force integer type
+                $stmt = mysqli_prepare($conn, "UPDATE eoi SET status='Accepted' WHERE EOInumber=?");
+                mysqli_stmt_bind_param($stmt, "i", $eoi_num);
                 
                 if (mysqli_stmt_execute($stmt)) {
                     if (mysqli_stmt_affected_rows($stmt) > 0) {
-                        $message = "Status updated successfully for EOI #" . htmlspecialchars($eoi_num) . " to '" . htmlspecialchars($new_status) . "'";
+                        $message = "✅ EOI #" . htmlspecialchars($eoi_num) . " has been ACCEPTED successfully!";
                         $message_type = "success";
                         
                         // Fetch and display the updated record
@@ -321,70 +82,335 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         
                         if ($row = mysqli_fetch_assoc($fetch_result)) {
                             $results[] = $row;
-                            $search_performed = "Updated Record - EOI #" . htmlspecialchars($eoi_num);
+                            $search_performed = "Accepted Application - EOI #" . htmlspecialchars($eoi_num);
                             $show_results = true;
                         }
                         mysqli_stmt_close($fetch_stmt);
                     } else {
-                        $message = "EOI number #" . htmlspecialchars($eoi_num) . " not found";
+                        $message = "EOI #" . htmlspecialchars($eoi_num) . " not found";
                         $message_type = "error";
                     }
                 } else {
-                    error_log("Status update error: " . mysqli_stmt_error($stmt));
-                    $message = "Error updating status";
-                    $message_type = "error";
-                }
-                mysqli_stmt_close($stmt);
-            }
-        } else {
-            $message = "Please enter both EOI number and select a status";
-            $message_type = "error";
-        }
-    }
-
-    // DELETE EOIs BY JOB REFERENCE
-    if (isset($_POST['delete_by_job'])) {
-        $job_ref = trim($_POST['delete_job_reference']);
-        
-        if (!empty($job_ref)) {
-            // First, get count of records to be deleted
-            $count_stmt = mysqli_prepare($conn, "SELECT COUNT(*) as count FROM eoi WHERE job_reference=?");
-            mysqli_stmt_bind_param($count_stmt, "s", $job_ref);
-            mysqli_stmt_execute($count_stmt);
-            $count_result = mysqli_stmt_get_result($count_stmt);
-            $count_row = mysqli_fetch_assoc($count_result);
-            $records_to_delete = $count_row['count'];
-            mysqli_stmt_close($count_stmt);
-            
-            if ($records_to_delete > 0) {
-                // Proceed with deletion
-                $stmt = mysqli_prepare($conn, "DELETE FROM eoi WHERE job_reference=?");
-                mysqli_stmt_bind_param($stmt, "s", $job_ref);
-                
-                if (mysqli_stmt_execute($stmt)) {
-                    $message = "Successfully deleted $records_to_delete record(s) for job reference: " . htmlspecialchars($job_ref);
-                    $message_type = "success";
-                } else {
-                    error_log("Delete operation error: " . mysqli_stmt_error($stmt));
-                    $message = "Error occurred during deletion";
+                    error_log("Quick accept error: " . mysqli_stmt_error($stmt));
+                    $message = "Error accepting EOI";
                     $message_type = "error";
                 }
                 mysqli_stmt_close($stmt);
             } else {
-                $message = "No records found to delete for job reference: " . htmlspecialchars($job_ref);
+                $message = "Please enter a valid EOI number";
                 $message_type = "error";
             }
-        } else {
-            $message = "Please enter a job reference number to delete";
-            $message_type = "error";
         }
-    }
 
-    // EXPORT TO CSV
-    if (isset($_POST['export_csv'])) {
-        // Need to re-fetch results based on current session or re-run last query
-        // For now, we'll handle this separately
-    }
+        // BULK ACCEPT BY JOB REFERENCE (NEW FEATURE - HD QUALITY)
+        if (isset($_POST['bulk_accept'])) {
+            $job_ref = trim($_POST['bulk_accept_job_ref']);
+            
+            if (!empty($job_ref)) {
+                // First, get count of records to be accepted (includes blank, NULL, New, Current)
+                $count_stmt = mysqli_prepare($conn, "SELECT COUNT(*) as count FROM eoi WHERE job_reference=? AND (status IS NULL OR status = '' OR status NOT IN ('Accepted', 'Final'))");
+                mysqli_stmt_bind_param($count_stmt, "s", $job_ref);
+                mysqli_stmt_execute($count_stmt);
+                $count_result = mysqli_stmt_get_result($count_stmt);
+                $count_row = mysqli_fetch_assoc($count_result);
+                $records_to_accept = $count_row['count'];
+                mysqli_stmt_close($count_stmt);
+                
+                if ($records_to_accept > 0) {
+                    // Proceed with bulk acceptance - update ALL records including blank/NULL statuses
+                    $stmt = mysqli_prepare($conn, "UPDATE eoi SET status='Accepted' WHERE job_reference=? AND (status IS NULL OR status = '' OR status NOT IN ('Accepted', 'Final'))");
+                    mysqli_stmt_bind_param($stmt, "s", $job_ref);
+                    
+                    if (mysqli_stmt_execute($stmt)) {
+                        $affected = mysqli_stmt_affected_rows($stmt);
+                        if ($affected > 0) {
+                            $message = "✅ Successfully accepted $affected EOI(s) for job reference: " . htmlspecialchars($job_ref);
+                            $message_type = "success";
+                            
+                            // Fetch and display the accepted records
+                            $fetch_stmt = mysqli_prepare($conn, "SELECT * FROM eoi WHERE job_reference=? ORDER BY EOInumber DESC");
+                            mysqli_stmt_bind_param($fetch_stmt, "s", $job_ref);
+                            mysqli_stmt_execute($fetch_stmt);
+                            $fetch_result = mysqli_stmt_get_result($fetch_stmt);
+                            
+                            while ($row = mysqli_fetch_assoc($fetch_result)) {
+                                $results[] = $row;
+                            }
+                            $search_performed = "Bulk Accepted - Job Reference: " . htmlspecialchars($job_ref);
+                            $show_results = true;
+                            
+                            mysqli_stmt_close($fetch_stmt);
+                        } else {
+                            $message = "No records were updated. They may already be accepted.";
+                            $message_type = "error";
+                        }
+                    } else {
+                        error_log("Bulk accept error: " . mysqli_stmt_error($stmt));
+                        $message = "Error occurred during bulk acceptance: " . mysqli_error($conn);
+                        $message_type = "error";
+                    }
+                    mysqli_stmt_close($stmt);
+                } else {
+                    $message = "No pending records found to accept for job reference: " . htmlspecialchars($job_ref);
+                    $message_type = "error";
+                }
+            } else {
+                $message = "Please enter a job reference number";
+                $message_type = "error";
+            }
+        }
+        
+        // LIST ALL EOIs WITH SORTING - CRITICAL FIX: Prepared statement for pagination
+        if (isset($_POST['list_all'])) {
+            $sort_field = isset($_POST['sort_field']) && !empty($_POST['sort_field']) ? $_POST['sort_field'] : 'EOInumber';
+            $sort_order = isset($_POST['sort_order']) ? $_POST['sort_order'] : 'ASC';
+            
+            // Store in session
+            $_SESSION['last_search'] = array(
+                'type' => 'list_all',
+                'sort_field' => $sort_field,
+                'sort_order' => $sort_order
+            );
+            
+            // Whitelist allowed fields to prevent SQL injection
+            $allowed_fields = ['EOInumber', 'first_name', 'last_name', 'job_reference', 'status', 'created_at'];
+            $sort_field = in_array($sort_field, $allowed_fields) ? $sort_field : 'EOInumber';
+            $sort_order = ($sort_order == 'DESC') ? 'DESC' : 'ASC';
+            
+            // Get total count for pagination
+            $count_query = "SELECT COUNT(*) as total FROM eoi";
+            $count_result = mysqli_query($conn, $count_query);
+            $count_row = mysqli_fetch_assoc($count_result);
+            $total_records = $count_row['total'];
+            $total_pages = ceil($total_records / $records_per_page);
+            
+            // CRITICAL FIX: Use prepared statement with proper binding
+            $query = "SELECT * FROM eoi ORDER BY `$sort_field` $sort_order LIMIT ? OFFSET ?";
+            $stmt = mysqli_prepare($conn, $query);
+            mysqli_stmt_bind_param($stmt, "ii", $records_per_page, $offset);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+            
+            if ($result) {
+                if (mysqli_num_rows($result) > 0) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        $results[] = $row;
+                    }
+                    $search_performed = "All EOI Records (sorted by " . ucfirst(str_replace('_', ' ', $sort_field)) . " - $sort_order)";
+                    $message = "Showing " . count($results) . " of $total_records total records";
+                    $message_type = "success";
+                    $show_results = true;
+                } else {
+                    $message = "No records found in database";
+                    $message_type = "error";
+                }
+            } else {
+                error_log("Database query error: " . mysqli_error($conn));
+                $message = "Error retrieving records";
+                $message_type = "error";
+            }
+            mysqli_stmt_close($stmt);
+        }
+
+        // SEARCH BY JOB REFERENCE
+        if (isset($_POST['search_by_job'])) {
+            $job_ref = trim($_POST['job_reference']);
+            
+            // Store in session
+            $_SESSION['last_search'] = array(
+                'type' => 'job_ref',
+                'job_ref' => $job_ref
+            );
+            
+            if (!empty($job_ref)) {
+                $stmt = mysqli_prepare($conn, "SELECT * FROM eoi WHERE job_reference=? ORDER BY EOInumber DESC");
+                mysqli_stmt_bind_param($stmt, "s", $job_ref);
+                mysqli_stmt_execute($stmt);
+                $result = mysqli_stmt_get_result($stmt);
+                
+                if (mysqli_num_rows($result) > 0) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        $results[] = $row;
+                    }
+                    $search_performed = "Job Reference: " . htmlspecialchars($job_ref);
+                    $message = "Found " . count($results) . " record(s) for job reference: " . htmlspecialchars($job_ref);
+                    $message_type = "success";
+                    $show_results = true;
+                } else {
+                    $message = "No records found for job reference: " . htmlspecialchars($job_ref);
+                    $message_type = "error";
+                }
+                mysqli_stmt_close($stmt);
+            } else {
+                $message = "Please enter a job reference number";
+                $message_type = "error";
+            }
+        }
+
+        // SEARCH BY NAME (FIRST, LAST, OR BOTH)
+        if (isset($_POST['search_by_name'])) {
+            $firstname = trim($_POST['first_name']);
+            $lastname = trim($_POST['last_name']);
+            
+            // Store in session
+            $_SESSION['last_search'] = array(
+                'type' => 'name',
+                'first_name' => $firstname,
+                'last_name' => $lastname
+            );
+            
+            if (!empty($firstname) || !empty($lastname)) {
+                $conditions = array();
+                $types = "";
+                $params = array();
+                $search_terms = array();
+                
+                if (!empty($firstname)) {
+                    $conditions[] = "first_name LIKE ?";
+                    $types .= "s";
+                    $params[] = "%" . $firstname . "%";
+                    $search_terms[] = "First Name: " . htmlspecialchars($firstname);
+                }
+                
+                if (!empty($lastname)) {
+                    $conditions[] = "last_name LIKE ?";
+                    $types .= "s";
+                    $params[] = "%" . $lastname . "%";
+                    $search_terms[] = "Last Name: " . htmlspecialchars($lastname);
+                }
+                
+                $query = "SELECT * FROM eoi WHERE " . implode(" AND ", $conditions) . " ORDER BY last_name, first_name";
+                $stmt = mysqli_prepare($conn, $query);
+                
+                if ($stmt) {
+                    mysqli_stmt_bind_param($stmt, $types, ...$params);
+                    mysqli_stmt_execute($stmt);
+                    $result = mysqli_stmt_get_result($stmt);
+                    
+                    if (mysqli_num_rows($result) > 0) {
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            $results[] = $row;
+                        }
+                        $search_performed = implode(", ", $search_terms);
+                        $message = "Found " . count($results) . " matching applicant(s)";
+                        $message_type = "success";
+                        $show_results = true;
+                    } else {
+                        $message = "No matching applicants found";
+                        $message_type = "error";
+                    }
+                    mysqli_stmt_close($stmt);
+                } else {
+                    error_log("Database prepare error: " . mysqli_error($conn));
+                    $message = "Error performing search";
+                    $message_type = "error";
+                }
+            } else {
+                $message = "Please enter at least first name, last name, or both";
+                $message_type = "error";
+            }
+        }
+
+        // UPDATE EOI STATUS - CRITICAL FIX: Validate status input
+        if (isset($_POST['update_status'])) {
+            $eoi_num = trim($_POST['eoi_number']);
+            $new_status = trim($_POST['new_status']);
+            
+            // CRITICAL FIX: Whitelist allowed statuses
+            $allowed_statuses = ['New', 'Current', 'Final', 'Accepted'];
+            
+            if (!empty($eoi_num) && !empty($new_status)) {
+                // Validate EOI number is numeric
+                if (!is_numeric($eoi_num)) {
+                    $message = "EOI number must be a valid number";
+                    $message_type = "error";
+                } elseif (!in_array($new_status, $allowed_statuses)) {
+                    $message = "Invalid status selected";
+                    $message_type = "error";
+                } else {
+                    $eoi_num = (int)$eoi_num; // Force integer
+                    $stmt = mysqli_prepare($conn, "UPDATE eoi SET status=? WHERE EOInumber=?");
+                    mysqli_stmt_bind_param($stmt, "si", $new_status, $eoi_num);
+                    
+                    if (mysqli_stmt_execute($stmt)) {
+                        if (mysqli_stmt_affected_rows($stmt) > 0) {
+                            $message = "Status updated successfully for EOI #" . htmlspecialchars($eoi_num) . " to '" . htmlspecialchars($new_status) . "'";
+                            $message_type = "success";
+                            
+                            // Fetch and display the updated record
+                            $fetch_stmt = mysqli_prepare($conn, "SELECT * FROM eoi WHERE EOInumber=?");
+                            mysqli_stmt_bind_param($fetch_stmt, "i", $eoi_num);
+                            mysqli_stmt_execute($fetch_stmt);
+                            $fetch_result = mysqli_stmt_get_result($fetch_stmt);
+                            
+                            if ($row = mysqli_fetch_assoc($fetch_result)) {
+                                $results[] = $row;
+                                $search_performed = "Updated Record - EOI #" . htmlspecialchars($eoi_num);
+                                $show_results = true;
+                            }
+                            mysqli_stmt_close($fetch_stmt);
+                        } else {
+                            $message = "EOI number #" . htmlspecialchars($eoi_num) . " not found";
+                            $message_type = "error";
+                        }
+                    } else {
+                        error_log("Status update error: " . mysqli_stmt_error($stmt));
+                        $message = "Error updating status";
+                        $message_type = "error";
+                    }
+                    mysqli_stmt_close($stmt);
+                }
+            } else {
+                $message = "Please enter both EOI number and select a status";
+                $message_type = "error";
+            }
+        }
+
+        // DELETE EOIs BY JOB REFERENCE
+        if (isset($_POST['delete_by_job'])) {
+            $job_ref = trim($_POST['delete_job_reference']);
+            
+            if (!empty($job_ref)) {
+                // First, get count of records to be deleted
+                $count_stmt = mysqli_prepare($conn, "SELECT COUNT(*) as count FROM eoi WHERE job_reference=?");
+                mysqli_stmt_bind_param($count_stmt, "s", $job_ref);
+                mysqli_stmt_execute($count_stmt);
+                $count_result = mysqli_stmt_get_result($count_stmt);
+                $count_row = mysqli_fetch_assoc($count_result);
+                $records_to_delete = $count_row['count'];
+                mysqli_stmt_close($count_stmt);
+                
+                if ($records_to_delete > 0) {
+                    // Proceed with deletion
+                    $stmt = mysqli_prepare($conn, "DELETE FROM eoi WHERE job_reference=?");
+                    mysqli_stmt_bind_param($stmt, "s", $job_ref);
+                    
+                    if (mysqli_stmt_execute($stmt)) {
+                        $message = "Successfully deleted $records_to_delete record(s) for job reference: " . htmlspecialchars($job_ref);
+                        $message_type = "success";
+                    } else {
+                        error_log("Delete operation error: " . mysqli_stmt_error($stmt));
+                        $message = "Error occurred during deletion";
+                        $message_type = "error";
+                    }
+                    mysqli_stmt_close($stmt);
+                } else {
+                    $message = "No records found to delete for job reference: " . htmlspecialchars($job_ref);
+                    $message_type = "error";
+                }
+            } else {
+                $message = "Please enter a job reference number to delete";
+                $message_type = "error";
+            }
+        }
+
+        // EXPORT TO CSV
+        if (isset($_POST['export_csv'])) {
+            // Need to re-fetch results based on current session or re-run last query
+            // For now, we'll handle this separately
+        }
+        
+    } // End CSRF validation
 }
 
 // Handle back to results request
@@ -405,9 +431,12 @@ if (isset($_GET['back_to_results']) && isset($_SESSION['last_search'])) {
         $total_records = $count_row['total'];
         $total_pages = ceil($total_records / $records_per_page);
         
-        $safe_sort_field = mysqli_real_escape_string($conn, $sort_field);
-        $query = "SELECT * FROM eoi ORDER BY $safe_sort_field $sort_order LIMIT $records_per_page OFFSET $offset";
-        $result = mysqli_query($conn, $query);
+        // CRITICAL FIX: Use prepared statement
+        $query = "SELECT * FROM eoi ORDER BY `$sort_field` $sort_order LIMIT ? OFFSET ?";
+        $stmt = mysqli_prepare($conn, $query);
+        mysqli_stmt_bind_param($stmt, "ii", $records_per_page, $offset);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
         
         if ($result && mysqli_num_rows($result) > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
@@ -416,6 +445,7 @@ if (isset($_GET['back_to_results']) && isset($_SESSION['last_search'])) {
             $search_performed = "All EOI Records (sorted by " . ucfirst(str_replace('_', ' ', $sort_field)) . " - $sort_order)";
             $show_results = true;
         }
+        mysqli_stmt_close($stmt);
     } elseif ($last_search['type'] == 'job_ref') {
         $job_ref = $last_search['job_ref'];
         $stmt = mysqli_prepare($conn, "SELECT * FROM eoi WHERE job_reference=? ORDER BY EOInumber DESC");
@@ -489,9 +519,11 @@ if (isset($_GET['details']) && is_numeric($_GET['details']) && !isset($_GET['bac
             $sort_field = in_array($sort_field, $allowed_fields) ? $sort_field : 'EOInumber';
             $sort_order = ($sort_order == 'DESC') ? 'DESC' : 'ASC';
             
-            $safe_sort_field = mysqli_real_escape_string($conn, $sort_field);
-            $query = "SELECT * FROM eoi ORDER BY $safe_sort_field $sort_order";
-            $result = mysqli_query($conn, $query);
+            // CRITICAL FIX: Use prepared statement
+            $query = "SELECT * FROM eoi ORDER BY `$sort_field` $sort_order";
+            $stmt = mysqli_prepare($conn, $query);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
             
             if ($result && mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
@@ -501,6 +533,7 @@ if (isset($_GET['details']) && is_numeric($_GET['details']) && !isset($_GET['bac
                 $show_results = true;
                 $show_details_for = $eoi_id;
             }
+            mysqli_stmt_close($stmt);
         } elseif ($last_search['type'] == 'job_ref') {
             $job_ref = $last_search['job_ref'];
             $stmt = mysqli_prepare($conn, "SELECT * FROM eoi WHERE job_reference=? ORDER BY EOInumber DESC");
@@ -658,6 +691,8 @@ closeDatabaseConnection($conn);
                                             <a href="?details=<?php echo $row['EOInumber']; ?>" class="view-details-btn">View Details</a>
                                             <?php if (strtolower($row['status']) != 'accepted'): ?>
                                                 <form method="post" style="display: inline; margin: 0;">
+                                                    <!-- CRITICAL FIX: Added CSRF token -->
+                                                    <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
                                                     <input type="hidden" name="accept_eoi_number" value="<?php echo $row['EOInumber']; ?>">
                                                     <button type="submit" name="quick_accept" class="accept-btn" onclick="return confirm('Accept EOI #<?php echo $row['EOInumber']; ?> for <?php echo htmlspecialchars($row['first_name'] . ' ' . $row['last_name']); ?>?');">
                                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
@@ -684,6 +719,8 @@ closeDatabaseConnection($conn);
                                             <?php if (strtolower($row['status']) != 'accepted'): ?>
                                                 <div style="margin: 20px 0; text-align: center; padding: 20px; background: #f0fdf4; border-radius: 8px; border: 2px dashed #10b981;">
                                                     <form method="post" style="display: inline;">
+                                                        <!-- CRITICAL FIX: Added CSRF token -->
+                                                        <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
                                                         <input type="hidden" name="accept_eoi_number" value="<?php echo $row['EOInumber']; ?>">
                                                         <button type="submit" name="quick_accept" class="accept-btn accept-btn-large" onclick="return confirm('✅ Accept this EOI application?\n\nApplicant: <?php echo htmlspecialchars($row['first_name'] . ' ' . $row['last_name']); ?>\nJob Reference: <?php echo htmlspecialchars($row['job_reference']); ?>\nEOI #<?php echo $row['EOInumber']; ?>');">
                                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
@@ -877,6 +914,8 @@ closeDatabaseConnection($conn);
                 <h2>✅ Quick Accept EOI</h2>
                 <p style="font-size: 14px; color: #059669; margin-bottom: 15px;">Instantly approve an application by EOI number</p>
                 <form method="post">
+                    <!-- CRITICAL FIX: Added CSRF token -->
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
                     <div class="form-group">
                         <label for="accept_eoi_number">EOI Number:</label>
                         <input type="number" name="accept_eoi_number" id="accept_eoi_number" placeholder="Enter EOI number" required>
@@ -895,6 +934,8 @@ closeDatabaseConnection($conn);
                 <h2>✅ Bulk Accept by Job Reference</h2>
                 <p style="font-size: 14px; color: #059669; margin-bottom: 15px;">Accept all pending applications for a specific job</p>
                 <form method="post" onsubmit="return confirm('⚠️ BULK ACCEPT CONFIRMATION\n\nThis will accept ALL pending EOIs for this job reference.\n\nAre you sure you want to continue?');">
+                    <!-- CRITICAL FIX: Added CSRF token -->
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
                     <div class="form-group">
                         <label for="bulk_accept_job_ref">Job Reference:</label>
                         <input type="text" name="bulk_accept_job_ref" id="bulk_accept_job_ref" placeholder="e.g. SWD93" required>
@@ -914,6 +955,8 @@ closeDatabaseConnection($conn);
             <div class="manage-card">
                 <h2>📋 List All EOIs</h2>
                 <form method="post">
+                    <!-- CRITICAL FIX: Added CSRF token -->
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="sort_field">Sort by:</label>
@@ -942,6 +985,8 @@ closeDatabaseConnection($conn);
             <div class="manage-card">
                 <h2>🔍 Search by Job Reference</h2>
                 <form method="post">
+                    <!-- CRITICAL FIX: Added CSRF token -->
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
                     <div class="form-group">
                         <label for="job_reference">Job Reference:</label>
                         <input type="text" name="job_reference" id="job_reference" placeholder="e.g. SWD93" required>
@@ -953,6 +998,8 @@ closeDatabaseConnection($conn);
             <div class="manage-card">
                 <h2>👤 Search by Applicant Name</h2>
                 <form method="post">
+                    <!-- CRITICAL FIX: Added CSRF token -->
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
                     <div class="form-group">
                         <label for="first_name">First Name:</label>
                         <input type="text" name="first_name" id="first_name" placeholder="Enter first name">
@@ -969,6 +1016,8 @@ closeDatabaseConnection($conn);
             <div class="manage-card">
                 <h2>✏️ Change EOI Status</h2>
                 <form method="post">
+                    <!-- CRITICAL FIX: Added CSRF token -->
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
                     <div class="form-group">
                         <label for="eoi_number">EOI Number:</label>
                         <input type="number" name="eoi_number" id="eoi_number" placeholder="Enter EOI number" required>
@@ -990,6 +1039,8 @@ closeDatabaseConnection($conn);
             <div class="manage-card danger-card">
                 <h2>🗑️ Delete EOI Records</h2>
                 <form method="post" onsubmit="return confirm('⚠️ WARNING: Are you sure you want to delete ALL EOIs for this job reference?\n\nThis action CANNOT be undone!');">
+                    <!-- CRITICAL FIX: Added CSRF token -->
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
                     <div class="form-group">
                         <label for="delete_job_reference">Job Reference:</label>
                         <input type="text" name="delete_job_reference" id="delete_job_reference" placeholder="e.g. SWD93" required>
@@ -1009,5 +1060,3 @@ closeDatabaseConnection($conn);
 
 </body>
 </html>
-// make this look good
-// ensure all information is set at proper places

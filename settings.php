@@ -6,10 +6,16 @@
  * This file contains:
  * - Database connection settings
  * - Connection management functions
+ * - Auto-initialization of database and tables
  * - Input sanitization functions
  * - Validation functions for form data
  * - CSRF protection functions
  */
+
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // ============================================================================
 // DATABASE CONFIGURATION
@@ -28,6 +34,160 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // ============================================================================
+// AUTO-INITIALIZATION FUNCTION
+// ============================================================================
+
+/**
+ * Initialize database and tables automatically if they don't exist
+ * This runs once per session to avoid repeated checks
+ */
+function initializeDatabase() {
+    global $host, $user, $pwd, $sql_db;
+    
+    // Only check once per session
+    if (isset($_SESSION['db_initialized'])) {
+        return true;
+    }
+    
+    $conn = @mysqli_connect($host, $user, $pwd);
+    
+    if (!$conn) {
+        error_log("Database connection failed: " . mysqli_connect_error());
+        return false;
+    }
+    
+    // Create database if it doesn't exist
+    $create_db_sql = "CREATE DATABASE IF NOT EXISTS `$sql_db` 
+                      CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+    
+    if (!mysqli_query($conn, $create_db_sql)) {
+        error_log("Database creation failed: " . mysqli_error($conn));
+        mysqli_close($conn);
+        return false;
+    }
+    
+    // Select database
+    if (!mysqli_select_db($conn, $sql_db)) {
+        error_log("Database selection failed: " . mysqli_error($conn));
+        mysqli_close($conn);
+        return false;
+    }
+    
+    // Create EOI table
+    $eoi_table_sql = "CREATE TABLE IF NOT EXISTS `eoi` (
+        `EOInumber` INT(11) AUTO_INCREMENT PRIMARY KEY,
+        `job_reference` VARCHAR(10) NOT NULL,
+        `first_name` VARCHAR(20) NOT NULL,
+        `last_name` VARCHAR(20) NOT NULL,
+        `gender` ENUM('male', 'female', 'other') NULL,
+        `dob` VARCHAR(10) NULL,
+        `street_address` VARCHAR(40) NOT NULL,
+        `suburb_town` VARCHAR(40) NOT NULL,
+        `state` VARCHAR(40) NOT NULL,
+        `zone` VARCHAR(3) NULL,
+        `postcode` VARCHAR(4) NOT NULL,
+        `email` VARCHAR(255) NOT NULL,
+        `phone` VARCHAR(12) NOT NULL,
+        `skill1` VARCHAR(50) NULL,
+        `skill2` VARCHAR(50) NULL,
+        `skill3` VARCHAR(50) NULL,
+        `skill4` VARCHAR(50) NULL,
+        `other_skills` TEXT NULL,
+        `status` ENUM('New', 'Current', 'Final', 'Accepted') DEFAULT 'New' NOT NULL,
+        `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX `idx_job_reference` (`job_reference`),
+        INDEX `idx_status` (`status`),
+        INDEX `idx_email` (`email`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+    
+    mysqli_query($conn, $eoi_table_sql);
+    
+    // Create managers table
+    $managers_table_sql = "CREATE TABLE IF NOT EXISTS `managers` (
+        `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
+        `username` VARCHAR(50) NOT NULL UNIQUE,
+        `password` VARCHAR(255) NOT NULL,
+        `failed_attempts` INT(11) DEFAULT 0,
+        `locked_until` DATETIME NULL,
+        `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        `last_login` DATETIME NULL,
+        INDEX `idx_username` (`username`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+    
+    mysqli_query($conn, $managers_table_sql);
+    
+    // Create jobs table
+    $jobs_table_sql = "CREATE TABLE IF NOT EXISTS `jobs` (
+        `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
+        `job_reference` VARCHAR(10) NOT NULL UNIQUE,
+        `title` VARCHAR(100) NOT NULL,
+        `summary` TEXT NOT NULL,
+        `salary` VARCHAR(50) NOT NULL,
+        `job_type` VARCHAR(50) NOT NULL,
+        `location` VARCHAR(100) NOT NULL,
+        `reports_to` VARCHAR(100) NOT NULL,
+        `responsibilities` TEXT NOT NULL,
+        `required_skills` TEXT NOT NULL,
+        `preferred_skills` TEXT NOT NULL,
+        `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX `idx_job_reference` (`job_reference`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+    
+    mysqli_query($conn, $jobs_table_sql);
+    
+    // Insert default jobs if table is empty
+    $check_jobs = mysqli_query($conn, "SELECT COUNT(*) as count FROM jobs");
+    if ($check_jobs) {
+        $row = mysqli_fetch_assoc($check_jobs);
+        if ($row['count'] == 0) {
+            $default_jobs = array(
+                array('SWD93', 'Software Developer', 'Join our dynamic team as a Software Developer to design, develop, and maintain cutting-edge software solutions.', '$60,000 - $90,000', 'Full-time', 'Doha, Qatar', 'IT Manager', 'Write clean, scalable code|Collaborate with cross-functional teams|Debug and troubleshoot software issues|Participate in code reviews|Develop and maintain technical documentation', 'Proficiency in at least one programming language (Java, Python, C++, etc.)|Understanding of software development lifecycle|Problem-solving and analytical skills|Bachelor\'s degree in Computer Science or related field', 'Experience with Agile/Scrum methodologies|Knowledge of cloud platforms (AWS, Azure, GCP)|Familiarity with version control systems (Git)|Experience with CI/CD pipelines'),
+                array('NAD88', 'Network Administrator', 'Manage and maintain our organization\'s network infrastructure to ensure optimal performance and security.', '$55,000 - $80,000', 'Full-time', 'Doha, Qatar', 'IT Director', 'Monitor network performance and troubleshoot issues|Configure and maintain network hardware and software|Implement security measures and protocols|Manage user accounts and permissions|Document network configurations and changes', 'Knowledge of networking protocols (TCP/IP, DNS, DHCP)|Experience with routers, switches, and firewalls|Understanding of network security principles|Strong troubleshooting skills', 'Cisco CCNA or equivalent certification|Experience with network monitoring tools|Knowledge of virtualization technologies|Scripting skills (Python, PowerShell)'),
+                array('CSA71', 'Cybersecurity Analyst', 'Protect our organization\'s digital assets by identifying vulnerabilities and implementing security measures.', '$70,000 - $100,000', 'Full-time', 'Doha, Qatar', 'Security Manager', 'Monitor security systems for threats and anomalies|Conduct vulnerability assessments and penetration testing|Respond to security incidents|Implement security policies and procedures|Stay updated on latest security threats and trends', 'Knowledge of security frameworks (NIST, ISO 27001)|Experience with security tools (SIEM, IDS/IPS)|Understanding of threat intelligence|Incident response experience', 'Security certifications (CISSP, CEH, CompTIA Security+)|Experience with cloud security|Knowledge of compliance requirements|Forensics experience'),
+                array('CEN54', 'Cloud Engineer', 'Design and implement cloud infrastructure solutions to support our organization\'s digital transformation.', '$75,000 - $110,000', 'Full-time', 'Doha, Qatar', 'Cloud Architecture Lead', 'Design and deploy cloud infrastructure|Automate cloud operations and deployments|Monitor cloud resources and optimize costs|Implement cloud security best practices|Collaborate with development teams', 'Experience with cloud platforms (AWS, Azure, or GCP)|Knowledge of infrastructure as code (Terraform, CloudFormation)|Understanding of containerization (Docker, Kubernetes)|Strong scripting skills', 'Cloud certifications (AWS Certified, Azure Administrator)|DevOps experience|Knowledge of microservices architecture|Experience with CI/CD pipelines')
+            );
+            
+            foreach ($default_jobs as $job) {
+                $stmt = mysqli_prepare($conn, "INSERT INTO jobs (job_reference, title, summary, salary, job_type, location, reports_to, responsibilities, required_skills, preferred_skills) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                if ($stmt) {
+                    mysqli_stmt_bind_param($stmt, "ssssssssss", $job[0], $job[1], $job[2], $job[3], $job[4], $job[5], $job[6], $job[7], $job[8], $job[9]);
+                    mysqli_stmt_execute($stmt);
+                    mysqli_stmt_close($stmt);
+                }
+            }
+        }
+    }
+    
+    // Create default admin if no managers exist
+    $check_managers = mysqli_query($conn, "SELECT COUNT(*) as count FROM managers");
+    if ($check_managers) {
+        $row = mysqli_fetch_assoc($check_managers);
+        if ($row['count'] == 0) {
+            $default_username = "admin";
+            $default_password = "Admin123";
+            $hashed_password = password_hash($default_password, PASSWORD_DEFAULT);
+            
+            $stmt = mysqli_prepare($conn, "INSERT INTO managers (username, password, failed_attempts) VALUES (?, ?, 0)");
+            if ($stmt) {
+                mysqli_stmt_bind_param($stmt, "ss", $default_username, $hashed_password);
+                mysqli_stmt_execute($stmt);
+                mysqli_stmt_close($stmt);
+            }
+        }
+    }
+    
+    mysqli_close($conn);
+    
+    // Mark as initialized for this session
+    $_SESSION['db_initialized'] = true;
+    
+    return true;
+}
+
+// Auto-initialize database
+initializeDatabase();
+
+// ============================================================================
 // DATABASE CONNECTION FUNCTIONS
 // ============================================================================
 
@@ -36,7 +196,7 @@ error_reporting(E_ALL);
  * Creates database if it doesn't exist
  * Sets character encoding to UTF-8
  * 
- * @return mysqli|false Database connection object or false on failure
+ * @return mysqli|null Database connection object or null on failure
  */
 function getDatabaseConnection() {
     global $host, $user, $pwd, $sql_db;
@@ -45,7 +205,8 @@ function getDatabaseConnection() {
     $conn = @mysqli_connect($host, $user, $pwd);
     
     if (!$conn) {
-        return false;
+        error_log("Database connection failed: " . mysqli_connect_error());
+        return null;
     }
     
     // Check if database exists, create if not
@@ -55,7 +216,9 @@ function getDatabaseConnection() {
         if (mysqli_query($conn, $sql)) {
             mysqli_select_db($conn, $sql_db);
         } else {
-            return false;
+            error_log("Database creation failed: " . mysqli_error($conn));
+            mysqli_close($conn);
+            return null;
         }
     }
     
@@ -72,7 +235,7 @@ function getDatabaseConnection() {
  * @return void
  */
 function closeDatabaseConnection($conn) {
-    if ($conn) {
+    if ($conn && $conn instanceof mysqli) {
         mysqli_close($conn);
     }
 }
@@ -248,14 +411,7 @@ function validateCity($city) {
 }
 
 // ============================================================================
-// INITIALIZE DATABASE CONNECTION
+// DO NOT INITIALIZE GLOBAL CONNECTION
+// Each page should call getDatabaseConnection() when needed
 // ============================================================================
-
-// Establish database connection for use throughout the application
-$conn = getDatabaseConnection();
-
-// Check if connection was successful
-if (!$conn) {
-    die("Connection failed: Unable to connect to database");
-}
 ?>

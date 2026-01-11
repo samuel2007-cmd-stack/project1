@@ -7,20 +7,59 @@
 
 require_once 'settings.php';
 
+// Get database connection
+$conn = getDatabaseConnection();
+
 // Check if database connection exists
 if (!$conn) {
-    die("Database connection failed. Please try again later.");
+    error_log("Database connection failed in jobs.php");
+    ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Jobs Description - Control Alt Elite</title>
+    <link rel="stylesheet" href="styles/styles.css">
+    </head>
+    <body>
+    <?php include 'header.inc'; ?>
+    <main>
+        <p style="text-align: center; padding: 50px;">Database connection failed. Please try again later.</p>
+    </main>
+    <?php include 'footer.inc'; ?>
+    </body>
+    </html>
+    <?php
+    exit();
 }
 
 // Query to fetch all jobs
 $sql = "SELECT * FROM jobs";
-$result = $conn->query($sql);
+$result = mysqli_query($conn, $sql);
 
 // Check if query was successful
 if (!$result) {
-    error_log("Query error in jobs.php: " . $conn->error);
-    echo "<p>Error loading job listings. Please try again later.</p>";
+    error_log("Query error in jobs.php: " . mysqli_error($conn));
     closeDatabaseConnection($conn);
+    ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Jobs Description - Control Alt Elite</title>
+    <link rel="stylesheet" href="styles/styles.css">
+    </head>
+    <body>
+    <?php include 'header.inc'; ?>
+    <main>
+        <p style="text-align: center; padding: 50px;">Error loading job listings. Please try again later.</p>
+    </main>
+    <?php include 'footer.inc'; ?>
+    </body>
+    </html>
+    <?php
     exit();
 }
 ?>
@@ -64,9 +103,9 @@ skills and encourages your ideas. We bring: </p>
   <p><strong>Apply now to join us and build your future with Control Alt Elite.</strong></p>
 </aside>
 
-<?php if ($result && $result->num_rows > 0): ?>
+<?php if ($result && mysqli_num_rows($result) > 0): ?>
 
-<?php while ($job = $result->fetch_assoc()): ?>
+<?php while ($job = mysqli_fetch_assoc($result)): ?>
 
 <article class="job-posting">
   <details class="job-card">
@@ -137,7 +176,7 @@ skills and encourages your ideas. We bring: </p>
 <?php endwhile; ?>
 
 <?php else: ?>
-  <p>No job positions available at the moment. Please check back later.</p>
+  <p style="text-align: center; padding: 50px;">No job positions available at the moment. Please check back later.</p>
 <?php endif; ?>
 
 </main>

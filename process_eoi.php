@@ -5,8 +5,6 @@
  * Includes CSRF protection and comprehensive validation
  */
 
-session_start();
-
 // Prevent direct access - only allow POST requests
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
     error_log("Non-POST request to process_eoi.php: " . $_SERVER["REQUEST_METHOD"]);
@@ -25,9 +23,13 @@ if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
     die("Invalid security token. Please submit the form again.");
 }
 
+// Get database connection
+$conn = getDatabaseConnection();
+
 // Check database connection
-if (!isset($conn) || !$conn) {
-    die("Database connection failed.");
+if (!$conn) {
+    error_log("Database connection failed in process_eoi.php");
+    die("Database connection failed. Please try again later.");
 }
 
 // Initialize errors array
@@ -121,8 +123,8 @@ if (empty($suburb)) {
 // Validate Zone
 if (empty($zone)) {
     $errors[] = "Zone is required.";
-} elseif (strlen($zone) > 2) {
-    $errors[] = "Zone must be maximum 2 characters.";
+} elseif (!preg_match('/^\d{2}$/', $zone)) {
+    $errors[] = "Zone must be exactly 2 digits.";
 }
 
 // Validate Postcode
@@ -147,13 +149,20 @@ if (empty($email)) {
 // Validate Phone
 if (empty($phone)) {
     $errors[] = "Phone number is required.";
-} elseif (!preg_match('/^\d{8,12}$/', $phone)) {
-    $errors[] = "Phone number must be 8-12 digits.";
+} elseif (!preg_match('/^\d{8}$/', $phone)) {
+    $errors[] = "Phone number must be exactly 8 digits.";
 }
 
 // Validate Skills (at least one required)
 if (empty($skill1) && empty($skill2) && empty($skill3) && empty($skill4)) {
     $errors[] = "Please select at least one technical skill.";
+}
+
+// Validate Other Skills (required if any checkbox is selected)
+if (!empty($skill1) || !empty($skill2) || !empty($skill3) || !empty($skill4)) {
+    if (empty($otherskills)) {
+        $errors[] = "Please provide details in 'Other Skills' field when selecting technical skills.";
+    }
 }
 
 // ============================================================================
@@ -225,6 +234,11 @@ if (!empty($errors)) {
 
 // Create table if it doesn't exist (with DOB, Gender, and Zone columns)
 $table_check = mysqli_query($conn, "SHOW TABLES LIKE 'eoi'");
+if (!$table_check) {
+    error_log("Table check error: " . mysqli_error($conn));
+    die("Database error occurred. Please try again later.");
+}
+
 if (mysqli_num_rows($table_check) == 0) {
     $create_table_sql = "CREATE TABLE eoi (
         EOInumber INT(11) AUTO_INCREMENT PRIMARY KEY,
@@ -245,7 +259,7 @@ if (mysqli_num_rows($table_check) == 0) {
         skill3 VARCHAR(50) NULL,
         skill4 VARCHAR(50) NULL,
         other_skills TEXT NULL,
-        status ENUM('New', 'Current', 'Final') DEFAULT 'New' NOT NULL,
+        status ENUM('New', 'Current', 'Final', 'Accepted') DEFAULT 'New' NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
     
@@ -354,9 +368,40 @@ if (mysqli_stmt_execute($stmt)) {
 } else {
     // Log error and show user-friendly message
     error_log("Database execution error: " . mysqli_stmt_error($stmt));
-    echo "<h1>Error</h1>";
-    echo "<p>An error occurred while submitting your application. Please try again later.</p>";
-    echo "<a href='apply.php'>Back to Application Form</a>";
+    ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Error - Control Alt Elite</title>
+        <link rel="stylesheet" href="styles/styles.css">
+    </head>
+    <body class="auth-page">
+    
+    <?php include 'header.inc'; ?>
+    
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="error-message">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <div>
+                    <p>An error occurred while submitting your application. Please try again later.</p>
+                </div>
+            </div>
+            <a href="apply.php" class="auth-btn">Back to Application Form</a>
+        </div>
+    </div>
+    
+    <?php include 'footer.inc'; ?>
+    
+    </body>
+    </html>
+    <?php
 }
 
 // Clean up
