@@ -1009,5 +1009,3 @@ closeDatabaseConnection($conn);
 
 </body>
 </html>
-// make this look good
-// ensure all information is set at proper places
